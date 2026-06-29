@@ -122,7 +122,7 @@
 
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(26,47,35,0.55); align-items: center; justify-content: center; z-index: 100; padding: 20px; }
   .modal-overlay.active { display: flex; }
-  .modal-box { background: white; border-radius: 16px; padding: 20px; max-width: 420px; width: 100%; }
+  .modal-box { background: white; border-radius: 16px; padding: 20px; max-width: 420px; width: 100%; max-height: 88vh; overflow-y: auto; }
   .modal-close { text-align: right; }
   .modal-close button { background: none; border: none; font-size: 18px; cursor: pointer; color: #9a9378; }
   #testimonialCanvas {
@@ -233,7 +233,8 @@
 <div class="modal-overlay" id="bizModalOverlay">
   <div class="modal-box wide">
     <div class="modal-close"><button onclick="closeBizModal()">✕ Close</button></div>
-    <div class="section-title" style="margin-top:0;">Naya Client Add Karein</div>
+    <div class="section-title" style="margin-top:0;" id="bizModalTitle">Naya Client Add Karein</div>
+    <input type="hidden" id="bizEditMode" value="">
     <div class="form-grid">
       <div class="form-field"><label>Business ID (unique)</label><input type="text" id="newBizId" placeholder="e.g. DRSHARMA001"></div>
       <div class="form-field"><label>Business Naam</label><input type="text" id="newBizName" placeholder="e.g. Dr. Sharma Dental Clinic"></div>
@@ -489,9 +490,11 @@
                 <div class="biz-card-name">${escapeHtml(biz.businessName)}</div>
                 <div class="biz-card-type">${escapeHtml(biz.businessType)} · ID: ${biz.businessId}</div>
               </div>
-              <div style="display:flex; gap:8px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <button class="edit-sub-btn" onclick="selectBusinessForTabs('${biz.businessId}')">Select & View Data</button>
                 <button class="edit-sub-btn" style="background:var(--gold);" onclick="openTiersModal('${biz.businessId}', '${escapeHtml(biz.businessName)}')">🎁 Reward Tiers</button>
+                <button class="edit-sub-btn" style="background:#3b5b6e;" onclick='openEditBizModal(${JSON.stringify(biz)})'>✏️ Edit</button>
+                <button class="edit-sub-btn" style="background:var(--warm-red);" onclick="confirmDeleteBusiness('${biz.businessId}', '${escapeHtml(biz.businessName)}')">🗑 Delete</button>
               </div>
             </div>
             <div class="biz-meta-row">
@@ -524,14 +527,58 @@
   }
 
   document.getElementById('addBizBtn').addEventListener('click', () => {
+    document.getElementById('bizEditMode').value = '';
+    document.getElementById('bizModalTitle').textContent = 'Naya Client Add Karein';
+    document.getElementById('saveBizBtn').textContent = 'Client Save Karein';
+    ['newBizId','newBizName','newBizType','newBizPhone','newBizReviewLink','newBizStartDate','newBizRenewalDate','newBizFee'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('newBizId').disabled = false;
+    document.getElementById('newBizStatus').value = 'Trial';
     document.getElementById('bizModalOverlay').classList.add('active');
   });
   function closeBizModal() { document.getElementById('bizModalOverlay').classList.remove('active'); }
 
+  function openEditBizModal(biz) {
+    document.getElementById('bizEditMode').value = biz.businessId;
+    document.getElementById('bizModalTitle').textContent = 'Client Edit Karein — ' + biz.businessName;
+    document.getElementById('saveBizBtn').textContent = 'Changes Save Karein';
+    document.getElementById('newBizId').value = biz.businessId;
+    document.getElementById('newBizId').disabled = true; // Business ID edit mein change nahi hota
+    document.getElementById('newBizName').value = biz.businessName || '';
+    document.getElementById('newBizType').value = biz.businessType || '';
+    document.getElementById('newBizPhone').value = biz.adminPhone || '';
+    document.getElementById('newBizReviewLink').value = biz.googleReviewLink || '';
+    document.getElementById('newBizStartDate').value = biz.subscriptionStartDate || '';
+    document.getElementById('newBizRenewalDate').value = biz.renewalDate || '';
+    document.getElementById('newBizFee').value = biz.monthlyFee || '';
+    document.getElementById('newBizStatus').value = biz.subscriptionStatus || 'Active';
+    document.getElementById('bizModalOverlay').classList.add('active');
+  }
+
+  async function confirmDeleteBusiness(bizId, bizName) {
+    if (!confirm('Pakka delete karna hai "' + bizName + '" (' + bizId + ')?\n\nYe sirf business profile delete karega. Iske purane reviews/complaints/services history safe rahegi.\n\nYe action wapas nahi ho sakta.')) {
+      return;
+    }
+    try {
+      const res = await adminFetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'deleteBusiness', businessId: bizId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadBusinessesList();
+      } else {
+        alert('Delete nahi hua: ' + (data.error || 'Dobara try karein.'));
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
   document.getElementById('saveBizBtn').addEventListener('click', async () => {
+    const editMode = document.getElementById('bizEditMode').value;
     const payload = {
-      action: 'addBusiness',
-      businessId: document.getElementById('newBizId').value.trim(),
+      action: editMode ? 'editBusiness' : 'addBusiness',
+      businessId: editMode ? editMode : document.getElementById('newBizId').value.trim(),
       businessName: document.getElementById('newBizName').value.trim(),
       businessType: document.getElementById('newBizType').value.trim(),
       adminPhone: document.getElementById('newBizPhone').value.trim(),
@@ -546,6 +593,7 @@
       return;
     }
     const btn = document.getElementById('saveBizBtn');
+    const originalLabel = btn.textContent;
     btn.disabled = true; btn.textContent = 'Save ho raha hai...';
     try {
       const res = await adminFetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -553,14 +601,15 @@
       if (data.success) {
         closeBizModal();
         loadBusinessesList();
+        document.getElementById('newBizId').disabled = false;
         ['newBizId','newBizName','newBizType','newBizPhone','newBizReviewLink','newBizStartDate','newBizRenewalDate','newBizFee'].forEach(id => document.getElementById(id).value = '');
       } else {
-        alert('Save nahi hua, dobara try karein.');
+        alert(data.error || 'Save nahi hua, dobara try karein.');
       }
     } catch (err) {
       alert('Error: ' + err.message);
     }
-    btn.disabled = false; btn.textContent = 'Client Save Karein';
+    btn.disabled = false; btn.textContent = originalLabel;
   });
 
   // ================= SERVICES TAB =================
@@ -642,91 +691,4 @@
         method: 'POST',
         body: JSON.stringify({
           action: 'addService', businessId: currentBizId, serviceName: name,
-          serviceCategory: category, price: price, billingCycle: cycle, status: 'Active'
-        })
-      });
-      closeServiceModal();
-      loadActiveServices();
-    } catch (err) {
-      alert('Service add nahi hui.');
-    }
-  }
-
-  // ================= REWARD TIERS =================
-
-  let currentTiersBizId = "";
-  let currentTiers = [];
-
-  async function openTiersModal(bizId, bizName) {
-    currentTiersBizId = bizId;
-    document.getElementById('tiersBizName').textContent = bizName;
-    document.getElementById('tiersModalOverlay').classList.add('active');
-    document.getElementById('tiersList').innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
-
-    try {
-      const res = await adminFetch(`${SCRIPT_URL}?action=getBusiness&businessId=${bizId}`);
-      const data = await res.json();
-      currentTiers = (data.rewardTiers || []).slice();
-      renderTiersList();
-    } catch (err) {
-      currentTiers = [];
-      renderTiersList();
-    }
-  }
-
-  function renderTiersList() {
-    const list = document.getElementById('tiersList');
-    if (currentTiers.length === 0) {
-      list.innerHTML = '<div class="empty-state" style="padding:20px;">Abhi koi tier set nahi hai. Niche se add karein.</div>';
-      return;
-    }
-    currentTiers.sort((a, b) => Number(a.points) - Number(b.points));
-    list.innerHTML = currentTiers.map((t, idx) => `
-      <div class="service-row">
-        <div>
-          <div class="service-name">${t.points} Points</div>
-          <div class="service-cat">${escapeHtml(t.reward)}</div>
-        </div>
-        <button class="remove-service-btn" onclick="removeTierRow(${idx})">Remove</button>
-      </div>
-    `).join('');
-  }
-
-  function addTierRow() {
-    const points = document.getElementById('newTierPoints').value.trim();
-    const reward = document.getElementById('newTierReward').value.trim();
-    if (!points || !reward) { alert('Points aur Reward dono likhein.'); return; }
-    currentTiers.push({ points: Number(points), reward: reward });
-    document.getElementById('newTierPoints').value = '';
-    document.getElementById('newTierReward').value = '';
-    renderTiersList();
-  }
-
-  function removeTierRow(idx) {
-    currentTiers.splice(idx, 1);
-    renderTiersList();
-  }
-
-  function closeTiersModal() { document.getElementById('tiersModalOverlay').classList.remove('active'); }
-
-  document.getElementById('saveTiersBtn').addEventListener('click', async () => {
-    const btn = document.getElementById('saveTiersBtn');
-    btn.disabled = true; btn.textContent = 'Save ho raha hai...';
-    try {
-      await adminFetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'updateRewardTiers', businessId: currentTiersBizId, tiers: currentTiers })
-      });
-      closeTiersModal();
-    } catch (err) {
-      alert('Save nahi hua, dobara try karein.');
-    }
-    btn.disabled = false; btn.textContent = 'Tiers Save Karein';
-  });
-
-  // Load businesses on page load
-  loadBusinessesList();
-</script>
-
-</body>
-</html>
+          service
