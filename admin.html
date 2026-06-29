@@ -691,4 +691,91 @@
         method: 'POST',
         body: JSON.stringify({
           action: 'addService', businessId: currentBizId, serviceName: name,
-          service
+          serviceCategory: category, price: price, billingCycle: cycle, status: 'Active'
+        })
+      });
+      closeServiceModal();
+      loadActiveServices();
+    } catch (err) {
+      alert('Service add nahi hui.');
+    }
+  }
+
+  // ================= REWARD TIERS =================
+
+  let currentTiersBizId = "";
+  let currentTiers = [];
+
+  async function openTiersModal(bizId, bizName) {
+    currentTiersBizId = bizId;
+    document.getElementById('tiersBizName').textContent = bizName;
+    document.getElementById('tiersModalOverlay').classList.add('active');
+    document.getElementById('tiersList').innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
+
+    try {
+      const res = await adminFetch(`${SCRIPT_URL}?action=getBusiness&businessId=${bizId}`);
+      const data = await res.json();
+      currentTiers = (data.rewardTiers || []).slice();
+      renderTiersList();
+    } catch (err) {
+      currentTiers = [];
+      renderTiersList();
+    }
+  }
+
+  function renderTiersList() {
+    const list = document.getElementById('tiersList');
+    if (currentTiers.length === 0) {
+      list.innerHTML = '<div class="empty-state" style="padding:20px;">Abhi koi tier set nahi hai. Niche se add karein.</div>';
+      return;
+    }
+    currentTiers.sort((a, b) => Number(a.points) - Number(b.points));
+    list.innerHTML = currentTiers.map((t, idx) => `
+      <div class="service-row">
+        <div>
+          <div class="service-name">${t.points} Points</div>
+          <div class="service-cat">${escapeHtml(t.reward)}</div>
+        </div>
+        <button class="remove-service-btn" onclick="removeTierRow(${idx})">Remove</button>
+      </div>
+    `).join('');
+  }
+
+  function addTierRow() {
+    const points = document.getElementById('newTierPoints').value.trim();
+    const reward = document.getElementById('newTierReward').value.trim();
+    if (!points || !reward) { alert('Points aur Reward dono likhein.'); return; }
+    currentTiers.push({ points: Number(points), reward: reward });
+    document.getElementById('newTierPoints').value = '';
+    document.getElementById('newTierReward').value = '';
+    renderTiersList();
+  }
+
+  function removeTierRow(idx) {
+    currentTiers.splice(idx, 1);
+    renderTiersList();
+  }
+
+  function closeTiersModal() { document.getElementById('tiersModalOverlay').classList.remove('active'); }
+
+  document.getElementById('saveTiersBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveTiersBtn');
+    btn.disabled = true; btn.textContent = 'Save ho raha hai...';
+    try {
+      await adminFetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'updateRewardTiers', businessId: currentTiersBizId, tiers: currentTiers })
+      });
+      closeTiersModal();
+    } catch (err) {
+      alert('Save nahi hua, dobara try karein.');
+    }
+    btn.disabled = false; btn.textContent = 'Tiers Save Karein';
+  });
+
+  // Load businesses on page load
+  loadBusinessesList();
+</script>
+
+</body>
+</html>
