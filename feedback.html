@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3c2a">
+<title>ROSKYRO-OS | Customer Feedback</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- =============================================
+     ROSKYRO-OS · Feedback Form · v4
+     Design: conversational, one-screen-per-step,
+     gamified, mobile-first, Tier-2/3/4 optimised
+     ============================================= -->
+
+<style>
+/* ── TOKENS ─────────────────────────────────────── */
+:root {
+  --bg:          #f5f3ef;
+  --card:        #ffffff;
+  --ink:         #141c14;
+  --ink-muted:   #6b7060;
+  --border:      #e0ddd6;
+
+  --brand:       #1a4029;
+  --brand-mid:   #2d6645;
+  --brand-light: #e6f0eb;
+
+  --gold:        #c07c2a;
+  --gold-soft:   #fdf3e3;
+  --gold-border: #e8c97a;
+
+  --green-pop:   #22c55e;
+  --red-soft:    #fff0ef;
+  --red:         #dc3545;
+
+  --radius-lg:   20px;
+  --radius-md:   14px;
+  --radius-sm:   10px;
+  --radius-pill: 100px;
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.09);
+  --shadow-btn:  0 2px 8px rgba(26,64,41,.25);
+
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition: 0.28s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── RESET ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+}
+button { font-family: inherit; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+input, textarea { font-family: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ── LAYOUT ──────────────────────────────────────── */
+.app {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  background: var(--card);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+}
+
+/* ── TOP BAR ─────────────────────────────────────── */
+.top-bar {
+  background: var(--brand);
+  padding: 16px 20px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+.logo-img {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255,255,255,.12);
+}
+.top-bar-info { flex: 1; min-width: 0; }
+.brand-label {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.6);
+  font-weight: 600;
+}
+.biz-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+/* ── PROGRESS BAR ────────────────────────────────── */
+.progress-wrap {
+  background: var(--brand);
+  padding: 0 20px 14px;
+  flex-shrink: 0;
+}
+.progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.progress-label {
+  font-size: 11px;
+  color: rgba(255,255,255,.65);
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+.progress-pct {
+  font-size: 11px;
+  color: rgba(255,255,255,.65);
+  font-weight: 600;
+}
+.progress-track {
+  height: 4px;
+  background: rgba(255,255,255,.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gold-border);
+  border-radius: 2px;
+  transition: width .5s cubic-bezier(.4,0,.2,1);
+}
+.progress-wrap.hidden { display: none !important; }
+
+/* ── SCREEN CONTAINER ────────────────────────────── */
+.screens {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.screen {
+  position: absolute;
+  inset: 0;
+  padding: 24px 20px 32px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform var(--transition), opacity var(--transition);
+  pointer-events: none;
+}
+.screen.active {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: all;
+  position: relative;
+}
+.screen.exit-left {
+  transform: translateX(-60px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── UTILITY ─────────────────────────────────────── */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.text-muted { color: var(--ink-muted); }
+
+/* ── SCREEN HEADINGS ─────────────────────────────── */
+.screen-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--brand-mid);
+  margin-bottom: 6px;
+}
+.screen-title {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.screen-subtitle {
+  font-size: 14px;
+  color: var(--ink-muted);
+  line-height: 1.55;
+  margin-bottom: 24px;
+}
+
+/* ── WELCOME SCREEN ──────────────────────────────── */
+.welcome-hero {
+  text-align: center;
+  padding: 8px 0 20px;
+}
+.welcome-emoji { font-size: 56px; margin-bottom: 12px; line-height: 1; }
+.welcome-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+.welcome-sub {
+  font-size: 14px;
+  color: var(--ink-muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 24px;
+}
+
+.reward-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.reward-card {
+  background: var(--brand-light);
+  border-radius: var(--radius-md);
+  padding: 14px 8px;
+  text-align: center;
+}
+.reward-card .r-icon { font-size: 22px; margin-bottom: 6px; }
+.reward-card .r-pts {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brand);
+}
+.reward-card .r-lbl {
+  font-size: 10px;
+  color: var(--ink-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── BIG CTA BUTTON ──────────────────────────────── */
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-btn);
+  transition: background var(--transition), transform .15s;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: .01em;
+  min-height: 56px;
+}
+.btn-primary:active { transform: scale(.98); }
+.btn-primary:hover { background: var(--brand-mid); }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  color: var(--brand);
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  transition: background var(--transition);
+  min-height: 56px;
+}
+.btn-secondary:hover { background: var(--brand-light); }
+
+.btn-skip {
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 0;
+  text-align: center;
+  width: 100%;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── STAR RATING ─────────────────────────────────── */
+.star-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 12px 0 20px;
+}
+.star-btn {
+  font-size: 44px;
+  line-height: 1;
+  padding: 6px;
+  background: none;
+  border: none;
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1);
+  filter: grayscale(1) opacity(.4);
+  cursor: pointer;
+}
+.star-btn.active {
+  filter: none;
+  transform: scale(1.18);
+}
+.star-btn:hover { filter: none; transform: scale(1.12); }
+.rating-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-muted);
+  height: 20px;
+  font-weight: 500;
+  transition: color .2s;
+}
+
+/* ── EMOJI RATING (face buttons) ─────────────────── */
+.face-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.face-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 4px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 26px;
+  transition: border-color .2s, background .2s, transform .15s;
+  min-height: 72px;
+  cursor: pointer;
+}
+.face-btn span { font-size: 10px; color: var(--ink-muted); font-weight: 600; }
+.face-btn.selected {
+  border-color: var(--brand);
+  background: var(--brand-light);
+  transform: scale(1.06);
+}
+
+/* ── OPTION CHIPS ────────────────────────────────── */
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.chip {
+  padding: 10px 16px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.chip.selected {
+  border-color: var(--brand);
+  background: var(--brand-light);
+  color: var(--brand);
+}
+.chip:hover { border-color: var(--brand-mid); }
+
+/* ── FORM FIELDS ─────────────────────────────────── */
+.field { margin-bottom: 16px; }
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.field-optional {
+  font-weight: 400;
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+.field-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .2s, background .2s;
+  -webkit-appearance: none;
+}
+.field-input:focus {
+  border-color: var(--brand);
+  background: #fff;
+}
+.field-input::placeholder { color: #b0ac9e; }
+textarea.field-input {
+  resize: none;
+  min-height: 100px;
+  line-height: 1.55;
+}
+
+/* ── GOOGLE REVIEW BLOCK ─────────────────────────── */
+.google-block {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.google-logo {
+  width: 40px; height: 40px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.google-block h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.google-block p { font-size: 13px; color: var(--ink-muted); margin-bottom: 16px; line-height: 1.5; }
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  background: #4285f4;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background .2s;
+  min-height: 56px;
+}
+.btn-google:hover { background: #3367d6; }
+
+/* ── POINTS TOAST ────────────────────────────────── */
+.points-toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: var(--brand);
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 4px 20px rgba(26,64,41,.4);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity .3s, transform .3s;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.points-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── MEDIA UPLOAD ────────────────────────────────── */
+.media-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.media-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  min-height: 80px;
+  position: relative;
+}
+.media-option:hover { border-color: var(--brand); background: var(--brand-light); }
+.media-option.selected { border-color: var(--brand); background: var(--brand-light); }
+.media-option .m-icon { font-size: 28px; }
+.media-option .m-label { font-size: 13px; font-weight: 700; color: var(--ink); }
+.media-option .m-pts {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  background: var(--gold-soft);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+}
+.media-option input[type=file] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.media-preview-wrap { margin-bottom: 16px; border-radius: var(--radius-md); overflow: hidden; }
+.media-preview-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); }
+.media-preview-video { width: 100%; border-radius: var(--radius-md); }
+
+/* ── VIDEO GUIDE ─────────────────────────────────── */
+.video-guide {
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.video-guide .vg-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.video-guide ol {
+  padding-left: 16px;
+}
+.video-guide li {
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+/* ── POINTS SUMMARY CARD ─────────────────────────── */
+.pts-summary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-mid));
+  border-radius: var(--radius-lg);
+  padding: 22px 20px;
+  color: #fff;
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.pts-summary::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  background: rgba(255,255,255,.07);
+  border-radius: 50%;
+}
+.pts-big { font-size: 48px; font-weight: 800; line-height: 1; }
+.pts-label { font-size: 13px; opacity: .75; margin-top: 4px; font-weight: 500; }
+.pts-breakdown {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 14px;
+}
+.pts-tag {
+  background: rgba(255,255,255,.18);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ── REFERRAL CODE DISPLAY ───────────────────────── */
+.referral-block {
+  background: var(--bg);
+  border: 1.5px dashed var(--gold-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.referral-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.referral-code-big { font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: .08em; margin-bottom: 6px; word-break: break-all; }
+.referral-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  cursor: pointer;
+}
+
+/* ── TIER UNLOCK ─────────────────────────────────── */
+.tier-unlock {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: #fff;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.tier-unlock .tu-label { font-size: 12px; font-weight: 700; opacity: .8; margin-bottom: 4px; }
+.tier-unlock .tu-reward { font-size: 17px; font-weight: 800; }
+
+/* ── ACTION BUTTONS ──────────────────────────────── */
+.btn-whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  background: #25D366;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  min-height: 56px;
+  margin-bottom: 12px;
+}
+
+/* ── ERROR / INFO ────────────────────────────────── */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.alert-error { background: #fff0ef; color: var(--red); border-left: 3px solid var(--red); }
+.alert-info { background: var(--brand-light); color: var(--brand); border-left: 3px solid var(--brand); }
+
+/* ── LOADING SPINNER ─────────────────────────────── */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── CONFETTI ────────────────────────────────────── */
+.confetti-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  top: -10px;
+  animation: confetti-fall 2.5s ease-in forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+@keyframes confetti-fall {
+  to {
+    top: 110vh;
+    transform: rotate(720deg) translateX(80px);
+    opacity: 0;
+  }
+}
+
+/* ── RIPPLE ──────────────────────────────────────── */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  animation: ripple-anim .5s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple-anim {
+  from { width: 0; height: 0; opacity: 1; }
+  to { width: 120px; height: 120px; margin-left: -60px; margin-top: -60px; opacity: 0; }
+}
+
+/* ── BOTTOM NAV SAFE ─────────────────────────────── */
+.bottom-safe { height: env(safe-area-inset-bottom, 0px); }
+
+/* ── CONSENT ─────────────────────────────────────── */
+.consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+.consent-row input[type=checkbox] {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--brand);
+  margin-top: 1px;
+}
+
+/* ── DESKTOP ADAPTATION ──────────────────────────── */
+@media (min-width: 480px) {
+  body { padding: 24px 16px; align-items: flex-start; }
+  .app {
+    min-height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    margin: 0 auto;
+  }
+  .screens { min-height: 420px; }
+}
+
+/* ── ANIMATIONS ──────────────────────────────────── */
+@keyframes pop-in {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.pop-in { animation: pop-in .35s cubic-bezier(.34,1.56,.64,1) both; }
+
+@keyframes slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.slide-up { animation: slide-up .4s ease both; }
+
+/* ── SUCCESS ICON ────────────────────────────────── */
+.success-icon-wrap {
+  width: 80px; height: 80px;
+  background: var(--brand-light);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  margin: 0 auto 16px;
+}
+
+/* ── COMPLAINT SCREEN ────────────────────────────── */
+.empathy-block {
+  background: #fff8f7;
+  border: 1px solid #ffd6d2;
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+.empathy-block .e-icon { font-size: 40px; margin-bottom: 8px; }
+.empathy-block h3 { font-size: 17px; font-weight: 700; color: #c0392b; margin-bottom: 4px; }
+.empathy-block p { font-size: 13px; color: var(--ink-muted); line-height: 1.5; }
+
+/* ── DETAIL INPUTS (name/phone) ──────────────────── */
+.detail-block {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.detail-block .db-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+/* ── STEP DOTS ───────────────────────────────────── */
+.step-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 0 0;
+}
+.step-dot {
+  width: 6px; height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  transition: width .3s, background .3s;
+}
+.step-dot.active {
+  width: 20px;
+  background: var(--brand);
+}
+.step-dot.done { background: var(--brand-mid); }
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════════ -->
+<div class="app" id="app">
+
+  <!-- TOP BAR -->
+  <header class="top-bar" id="topBar">
+    <img class="logo-img" id="logoImg" src="data:image/png;base64,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" alt="ROSKYRO-OS">
+    <div class="top-bar-info">
+      <div class="brand-label">ROSKYRO-OS</div>
+      <div class="biz-name" id="bizNameHeader">Loading...</div>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-wrap hidden" id="progressWrap">
+    <div class="progress-row">
+      <span class="progress-label" id="progressLabel">Step 1 of 6</span>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+  <div class="screens" id="screensContainer">
+
+    <!-- ── SCREEN 0: WELCOME ────────────────── -->
+    <div class="screen active" id="screen-0" data-step="0">
+      <div class="welcome-hero">
+        <div class="welcome-emoji pop-in">🎁</div>
+        <div class="welcome-title" id="welcomeTitle">Aapka Swagat Hai!</div>
+        <div class="welcome-sub">Apna experience share karein aur instant rewards payein</div>
+        <div class="time-badge">⏱️ Sirf 30 second lagenge</div>
+      </div>
+
+      <div class="reward-cards">
+        <div class="reward-card">
+          <div class="r-icon">⭐</div>
+          <div class="r-pts" id="successPtsDisplay">+20</div>
+          <div class="r-lbl">Review Points</div>
+        </div>
+        <div class="reward-card">
+          <div class="r-icon">📷</div>
+          <div class="r-pts">+30</div>
+          <div class="r-lbl">Photo Bonus</div>
+        </div>
+        <div class="reward-card">
+          <div class="r-icon">🎥</div>
+          <div class="r-pts">+50</div>
+          <div class="r-lbl">Video Bonus</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="startBtn" onclick="goToStep(1)">
+        Shuru Karein &rarr;
+      </button>
+
+      <div id="errorBox0" class="alert alert-error hidden"></div>
+    </div>
+
+    <!-- ── SCREEN 1: DETAILS ────────────────── -->
+    <div class="screen" id="screen-1" data-step="1">
+      <div class="screen-eyebrow">Step 1 of 6</div>
+      <div class="screen-title">Aapka naam kya hai?</div>
+      <div class="screen-subtitle">Hum aapko personally thank karna chahte hain 🙏</div>
+
+      <div class="field">
+        <label class="field-label" for="customerName">Naam <span class="field-optional">(optional)</span></label>
+        <input class="field-input" type="text" id="customerName" placeholder="Jaise: Rahul, Priya..." autocomplete="name" inputmode="text">
+      </div>
+      <div class="field">
+        <label class="field-label" for="customerPhone">Mobile Number <span class="field-optional">(optional — points ke liye)</span></label>
+        <input class="field-input" type="tel" id="customerPhone" placeholder="10-digit number" inputmode="numeric" maxlength="10" autocomplete="tel">
+      </div>
+      <div class="field">
+        <label class="field-label" for="socialMediaId">Instagram / Social ID <span class="field-optional">(optional)</span></label>
+        <input class="field-input" type="text" id="socialMediaId" placeholder="@username" autocomplete="off">
+      </div>
+
+      <button class="btn-primary" onclick="goToStep(2)">Aage Barhen &rarr;</button>
+      <div id="errorBox1" class="alert alert-error hidden" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ── SCREEN 2: RATING ─────────────────── -->
+    <div class="screen" id="screen-2" data-step="2">
+      <div class="screen-eyebrow">Step 2 of 6</div>
+      <div class="screen-title">Aapka experience kaisa raha?</div>
+      <div class="screen-subtitle">Star tap karein — automatic next step hoga</div>
+
+      <div class="face-grid" id="faceGrid">
+        <button class="face-btn" data-rating="1" onclick="selectRating(1)">😞<span>Bahut Bura</span></button>
+        <button class="face-btn" data-rating="2" onclick="selectRating(2)">😕<span>Theek Nahi</span></button>
+        <button class="face-btn" data-rating="3" onclick="selectRating(3)">🙂<span>Theek Hai</span></button>
+        <button class="face-btn" data-rating="4" onclick="selectRating(4)">😊<span>Accha</span></button>
+        <button class="face-btn" data-rating="5" onclick="selectRating(5)">🤩<span>Excellent!</span></button>
+      </div>
+
+      <div class="star-row" id="starRow">
+        <button class="star-btn" data-rating="1" onclick="selectRating(1)">⭐</button>
+        <button class="star-btn" data-rating="2" onclick="selectRating(2)">⭐</button>
+        <button class="star-btn" data-rating="3" onclick="selectRating(3)">⭐</button>
+        <button class="star-btn" data-rating="4" onclick="selectRating(4)">⭐</button>
+        <button class="star-btn" data-rating="5" onclick="selectRating(5)">⭐</button>
+      </div>
+      <div class="rating-hint" id="ratingHint">👆 Star ya emoji tap karein</div>
+
+      <div id="errorBox2" class="alert alert-error hidden" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ── SCREEN 3A: POSITIVE / GOOGLE ────── -->
+    <div class="screen" id="screen-3p" data-step="3">
+      <div class="screen-eyebrow">Step 3 of 6</div>
+      <div class="screen-title">🎉Dhanyvad ! Aap amazing hain!</div>
+      <div class="screen-subtitle">Aapne <strong id="ratingStarsDisplay"></strong> diya — aapko <span id="successPtsMsg">+20</span> Points mile!</div>
+
+      <div class="google-block">
+        <div class="google-logo">🌐</div>
+        <h3>Google Review Dein</h3>
+        <p>Google Review se doosron ko bhi madad hogi. Sirf 1 minute lagega!</p>
+        <a href="#" id="googleReviewBtn" class="btn-google" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.6 20.2H42V20H24v8h11.3C33.7 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.8z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.1L31.7 33c-2 1.5-4.5 2.3-7.3 2.3-5.2 0-9.6-3.5-11.2-8.3l-6.5 5C9.5 39.5 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.1-2.1 3.9-3.9 5.2l6.2 5.3C37.2 40.3 44 35 44 24c0-1.3-.1-2.5-.4-3.8z"/></svg>
+          Google Review Dein
+        </a>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="feedbackTextPositive">Kuch aur bolna chahenge? <span class="field-optional">(optional)</span></label>
+        <textarea class="field-input" id="feedbackTextPositive" placeholder="Aapka experience hamare liye bahut important hai..."></textarea>
+      </div>
+
+      <button class="btn-primary" id="submitPositiveBtn" onclick="submitPositive()">Submit Karein ✓</button>
+      <div id="errorBox3p" class="alert alert-error hidden" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ── SCREEN 3B: COMPLAINT ─────────────── -->
+    <div class="screen" id="screen-3n" data-step="3">
+      <div class="empathy-block">
+        <div class="e-icon">🙏</div>
+        <h3>Hume aapki baat sunni chahiye</h3>
+        <p>Hum sudhar karenge. Aapka feedback bahut valuable hai.</p>
+      </div>
+
+      <div class="screen-eyebrow">Step 3 of 6</div>
+      <div class="screen-title">Kya galat hua?</div>
+      <div class="screen-subtitle">Tap karo — koi typing ki zaroorat nahi</div>
+
+      <div class="chip-grid" id="complaintChips">
+        <div class="chip" onclick="toggleChip(this, 'Poor Service')">😔 Kharab Service</div>
+        <div class="chip" onclick="toggleChip(this, 'Long Waiting')">⏳ Zyada Wait</div>
+        <div class="chip" onclick="toggleChip(this, 'Staff Behaviour')">😤 Staff Behaviour</div>
+        <div class="chip" onclick="toggleChip(this, 'Price')">💸 Mehenga</div>
+        <div class="chip" onclick="toggleChip(this, 'Quality')">📉 Quality</div>
+        <div class="chip" onclick="toggleChip(this, 'Cleanliness')">🧹 Safai</div>
+        <div class="chip" onclick="toggleChip(this, 'Other')">➕ Kuch Aur</div>
+      </div>
+
+      <div class="field hidden" id="otherComplaintField">
+        <label class="field-label" for="complaintDetails">Kripya batayein</label>
+        <textarea class="field-input" id="complaintDetails" placeholder="Jo problem aayi wo yahan likhein..." rows="3"></textarea>
+      </div>
+
+      <button class="btn-primary" id="submitNegativeBtn" onclick="submitNegative()">Submit Karein</button>
+      <div id="errorBox3n" class="alert alert-error hidden" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ── SCREEN 4: MEDIA UPLOAD ───────────── -->
+    <div class="screen" id="screen-4" data-step="4">
+      <div class="screen-eyebrow">Step 4 of 6</div>
+      <div class="screen-title">Photo ya Video add karein?</div>
+      <div class="screen-subtitle">Aur points kamayein! Bilkul optional hai.</div>
+
+      <div class="media-options">
+        <label class="media-option" id="photoOption" onclick="selectMedia('photo')">
+          <div class="m-icon">📷</div>
+          <div class="m-label">Photo</div>
+          <div class="m-pts">+30 pts</div>
+          <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="handleMediaUpload(event, 'photo')">
+        </label>
+        <label class="media-option" id="videoOption">
+          <div class="m-icon">🎥</div>
+          <div class="m-label">15 Sec Video</div>
+          <div class="m-pts">+50 pts</div>
+          <input type="file" accept="video/*" capture="camcorder" id="videoInput" onchange="handleMediaUpload(event, 'video')">
+        </label>
+      </div>
+
+      <div class="video-guide hidden" id="videoGuide">
+        <div class="vg-title">🎬 Video mein ye batayein:</div>
+        <ol>
+          <li>Aapko kya pasand aaya? (What did you like?)</li>
+          <li>Kya aap hamare baare mein doston ko batayenge?</li>
+          <li>Staff ke baare mein kya kaha jayega?</li>
+        </ol>
+      </div>
+
+      <div class="media-preview-wrap hidden" id="mediaPreviewWrap">
+        <img id="photoPreview" class="media-preview-img hidden" alt="Preview">
+        <video id="videoPreview" class="media-preview-video hidden" controls playsinline></video>
+      </div>
+
+      <div class="consent-row hidden" id="consentRow">
+        <input type="checkbox" id="consentCheck">
+        <label for="consentCheck">Main is business ko meri photo/video review social media ya website par share karne ki anumati deta/deti hoon</label>
+      </div>
+
+      <button class="btn-primary" id="mediaNextBtn" onclick="goToStep(5)">Aage Barhen &rarr;</button>
+      <button class="btn-skip" onclick="skipMedia()">Skip → (bina media ke)</button>
+      <div id="errorBox4" class="alert alert-error hidden" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- ── SCREEN 5: REFERRAL ───────────────── -->
+    <div class="screen" id="screen-5" data-step="5">
+      <div class="screen-eyebrow">Step 5 of 6</div>
+      <div class="screen-title">Koi Referral Code hai?</div>
+      <div class="screen-subtitle">Kisi dost ne code diya hoga to yahan dalein — dono ko bonus points milenge! 🎁</div>
+
+      <div class="field">
+        <label class="field-label" for="referralCodeInput">Referral Code <span class="field-optional">(optional)</span></label>
+        <input class="field-input" type="text" id="referralCodeInput" placeholder="Jaise: REF-ABC123" autocomplete="off" style="text-transform:uppercase; letter-spacing:.08em;">
+      </div>
+
+      <button class="btn-primary" onclick="submitFinal()">Submit Karein ✓</button>
+      <button class="btn-skip" onclick="skipReferralAndSubmit()">Skip → (referral nahi hai)</button>
+    </div>
+
+    <!-- ── SCREEN 6: THANK YOU ──────────────── -->
+    <div class="screen" id="screen-6" data-step="6">
+      <div class="text-center">
+        <div class="success-icon-wrap pop-in">🎉</div>
+        <h2 style="font-size:24px;font-weight:800;margin-bottom:6px;">Bahut Dhanyvad!</h2>
+        <p class="text-muted" id="successMsg" style="font-size:14px;line-height:1.6;margin-bottom:20px;">Aapka review humein mil gaya. Aap kamaal hain!</p>
+      </div>
+
+      <div class="pts-summary" id="ptsSummary">
+        <div class="pts-big" id="ptsEarnedDisplay">+0</div>
+        <div class="pts-label">Points aapke account mein jod diye</div>
+        <div class="pts-breakdown" id="ptsBreakdown"></div>
+      </div>
+
+      <div class="referral-block hidden" id="referralBlock">
+        <div class="referral-eyebrow">Aapka Referral Code</div>
+        <div class="referral-code-big" id="referralCodeDisplay">—</div>
+        <div style="font-size:12px;color:var(--ink-muted);margin-bottom:8px;">Doston ko share karein → dono ko bonus points</div>
+        <button class="referral-copy-btn" onclick="copyReferral()">📋 Copy Code</button>
+      </div>
+
+      <div class="tier-unlock hidden" id="tierUnlockBlock">
+        <div class="tu-label">🏆 Reward Unlock Hua!</div>
+        <div class="tu-reward" id="tierUnlockReward"></div>
+      </div>
+
+      <a href="#" id="whatsappShareBtn" class="btn-whatsapp hidden" target="_blank">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.5 14.4c-.3-.1-1.8-.9-2.1-1s-.5-.1-.7.2l-.9 1.1c-.1.2-.3.2-.6.1-1.7-.7-2.9-1.8-3.8-3.4-.3-.4.3-.4.7-1.3.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.4-1.1 1.1-1.1 2.7s1.2 3.2 1.3 3.4c.2.2 2.4 3.7 5.8 5.2.8.4 1.5.6 2 .7.8.2 1.6.2 2.2.1.7-.1 2.1-.9 2.4-1.7.3-.8.3-1.5.2-1.7l-.3-.2z"/><path d="M20.5 3.5A11.9 11.9 0 0012 0C5.4 0 0 5.4 0 12c0 2.1.5 4.1 1.5 5.9L0 24l6.3-1.6A11.9 11.9 0 0024 12c0-3.2-1.2-6.2-3.5-8.5zM12 22c-1.9 0-3.8-.5-5.4-1.4l-.4-.2-3.7 1 1-3.7-.2-.4C2.4 15.8 2 13.9 2 12 2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10z"/></svg>
+        WhatsApp pe Share Karein
+      </a>
+
+      <a href="#" id="googleReviewFinalBtn" class="btn-google hidden" target="_blank" style="margin-bottom:12px;" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 48 48" fill="none"><path fill="#FFC107" d="M43.6 20.2H42V20H24v8h11.3C33.7 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.8z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.1L31.7 33c-2 1.5-4.5 2.3-7.3 2.3-5.2 0-9.6-3.5-11.2-8.3l-6.5 5C9.5 39.5 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.1-2.1 3.9-3.9 5.2l6.2 5.3C37.2 40.3 44 35 44 24c0-1.3-.1-2.5-.4-3.8z"/></svg>
+        Google Review Dein
+      </a>
+
+      <div style="text-align:center;margin-top:8px;">
+        <button class="btn-skip" onclick="window.close()" style="color:var(--ink-muted);">Done ✓</button>
+      </div>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- POINTS TOAST -->
+  <div class="points-toast" id="pointsToast"></div>
+
+  <!-- BOTTOM SAFE AREA -->
+  <div class="bottom-safe"></div>
+</div><!-- /app -->
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+/* ── CONFIG ─────────────────────────────────────── */
+// Extract businessId and referredBy from URL params
+const URL_PARAMS   = new URLSearchParams(window.location.search);
+const BUSINESS_ID  = URL_PARAMS.get('b') || URL_PARAMS.get('businessId') || 'DEFAULT';
+const REFERRED_BY  = URL_PARAMS.get('ref') || '';
+
+// Google Apps Script URL — config.js se aata hai (SIRF config.js edit karna,
+// yahan ka fallback sirf emergency backup hai, config.js ke URL se sync rakhna)
+const SCRIPT_URL = (typeof ROSKYRO_CONFIG !== 'undefined' && ROSKYRO_CONFIG.APPS_SCRIPT_URL) ? ROSKYRO_CONFIG.APPS_SCRIPT_URL : 'https://script.google.com/macros/s/AKfycbyY3hjXfMZ3jGfp1Tfc_GhiBdk-KGSUYLwAg3X7BtWCng5v99APWRTB8dP4VSW1YG-Q/exec';
+
+// Robust fetch wrapper — Apps Script ke saath safe defaults (CORS preflight
+// avoid karta hai, redirects follow karta hai, errors clearly batata hai)
+async function safeFetch(url, options) {
+  var opts = Object.assign({ redirect: 'follow' }, options || {});
+  if (opts.method === 'POST') {
+    opts.headers = Object.assign({ 'Content-Type': 'text/plain;charset=utf-8' }, opts.headers || {});
+  }
+  var res;
+  try {
+    res = await fetch(url, opts);
+  } catch (networkErr) {
+    throw new Error('Network error: request server tak nahi pahunchi. Internet connection check karein. (' + networkErr.message + ')');
+  }
+  if (!res.ok) {
+    var bodyText = '';
+    try { bodyText = await res.text(); } catch (e) {}
+    throw new Error('Server error (HTTP ' + res.status + '). ' + (bodyText ? bodyText.slice(0, 200) : ''));
+  }
+  return res;
+}
+
+/* ── STATE ───────────────────────────────────────── */
+let currentStep     = 0;
+let selectedRating  = 0;
+let mediaUrl         = ''; // Cloudinary secure_url once uploaded — never base64
+let mediaType         = ''; // 'photo' | 'video'
+let mediaUploading    = false;
+let businessData    = {};
+let submitting      = false;
+let selectedComplaints = [];
+let pointsEarned    = 0;
+
+// Steps for progress tracking (excludes welcome=0 and success=6)
+const TOTAL_STEPS = 5;
+
+/* ── INIT ────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  loadBusiness();
+  // Pre-fill referral from URL
+  if (REFERRED_BY) {
+    document.getElementById('referralCodeInput').value = REFERRED_BY.toUpperCase();
+  }
+});
+
+/* ── LOAD BUSINESS DATA ──────────────────────────── */
+async function loadBusiness() {
+  try {
+    const res  = await safeFetch(`${SCRIPT_URL}?action=getBusiness&businessId=${BUSINESS_ID}`);
+    const data = await res.json();
+    if (data && data.businessName) {
+      businessData = data;
+      document.getElementById('bizNameHeader').textContent = data.businessName;
+      document.getElementById('welcomeTitle').textContent  = `${data.businessName} mein aapka swagat hai! ❤️`;
+
+      // Reward card pts
+      if (data.textPoints)  document.querySelectorAll('.r-pts')[0].textContent = `+${data.textPoints}`;
+      if (data.photoPoints) document.querySelectorAll('.r-pts')[1].textContent = `+${data.photoPoints}`;
+      if (data.videoPoints) document.querySelectorAll('.r-pts')[2].textContent = `+${data.videoPoints}`;
+    }
+  } catch (err) {
+    document.getElementById('bizNameHeader').textContent = 'ROSKYRO Business';
+  }
+}
+
+/* ── NAVIGATION ──────────────────────────────────── */
+function goToStep(step) {
+  // Validation before advancing
+  if (step === 2 && currentStep === 1) {
+    // Screen 1 is optional fields — always allow
+  }
+  if (step === 4 && currentStep < 4) {
+    // came from positive screen — fine
+  }
+
+  const current = document.getElementById(`screen-${getScreenId(currentStep)}`);
+  const next    = document.getElementById(`screen-${getScreenId(step)}`);
+
+  if (!current || !next) return;
+
+  // Slide out current
+  current.classList.remove('active');
+  current.classList.add('exit-left');
+
+  setTimeout(() => {
+    current.classList.remove('exit-left');
+    current.style.display = 'none';
+  }, 300);
+
+  // Slide in next
+  next.style.display = '';
+  requestAnimationFrame(() => {
+    next.classList.add('active');
+  });
+
+  currentStep = step;
+  updateProgress(step);
+  window.scrollTo(0, 0);
+}
+
+function getScreenId(step) {
+  // Map logical steps to DOM IDs
+  if (step === 3 && selectedRating >= 4) return '3p';
+  if (step === 3 && selectedRating <= 3 && selectedRating > 0) return '3n';
+  return step;
+}
+
+function updateProgress(step) {
+  const wrap  = document.getElementById('progressWrap');
+  const fill  = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  const pct   = document.getElementById('progressPct');
+
+  if (step === 0 || step === 6) {
+    wrap.classList.add('hidden');
+    return;
+  }
+  wrap.classList.remove('hidden');
+
+  const progress = Math.min(((step) / TOTAL_STEPS) * 100, 100);
+  fill.style.width = `${progress}%`;
+  label.textContent = `Step ${step} of ${TOTAL_STEPS}`;
+  pct.textContent   = `${Math.round(progress)}%`;
+}
+
+/* ── RATING ──────────────────────────────────────── */
+const ratingHints = ['', 'Bahut Bura 😞', 'Theek Nahi 😕', 'Theek Hai 🙂', 'Accha 😊', 'Excellent! 🤩'];
+
+function selectRating(rating) {
+  selectedRating = rating;
+
+  // Update face buttons
+  document.querySelectorAll('.face-btn').forEach(btn => {
+    btn.classList.toggle('selected', parseInt(btn.dataset.rating) === rating);
+  });
+
+  // Update star buttons
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.rating) <= rating);
+  });
+
+  document.getElementById('ratingHint').textContent = ratingHints[rating] || '';
+  document.getElementById('ratingHint').style.color = rating >= 4 ? 'var(--green-pop)' : rating <= 2 ? 'var(--red)' : 'var(--ink-muted)';
+
+  // Auto-advance after short delay
+  setTimeout(() => {
+    // Set stars display for positive screen
+    const starEmojis = '⭐'.repeat(rating);
+    const ratingDisp = document.getElementById('ratingStarsDisplay');
+    if (ratingDisp) ratingDisp.textContent = starEmojis;
+
+    // Show google review link
+    const googleBtn = document.getElementById('googleReviewBtn');
+    if (googleBtn) {
+      googleBtn.href = businessData.googleReviewLink || '#';
+    }
+
+    goToStep(3);
+  }, 600);
+}
+
+/* ── COMPLAINT CHIPS ─────────────────────────────── */
+function toggleChip(el, label) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) {
+    if (!selectedComplaints.includes(label)) selectedComplaints.push(label);
+  } else {
+    selectedComplaints = selectedComplaints.filter(c => c !== label);
+  }
+  // Show/hide text area for "Other"
+  const otherField = document.getElementById('otherComplaintField');
+  otherField.classList.toggle('hidden', !selectedComplaints.includes('Other'));
+}
+
+/* ── MEDIA UPLOAD ────────────────────────────────── */
+function selectMedia(type) {
+  const guide = document.getElementById('videoGuide');
+  if (type === 'video') {
+    guide.classList.remove('hidden');
+  } else {
+    guide.classList.add('hidden');
+  }
+}
+
+/* ── MEDIA UPLOAD: uploads straight to Cloudinary from the browser ──
+   Google Sheets / Apps Script can't store binary files, so the photo or
+   video is never sent there. It goes directly to Cloudinary's unsigned
+   upload endpoint, and only the resulting URL gets saved later. */
+async function handleMediaUpload(e, type) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (type === 'video' && file.size > 25 * 1024 * 1024) {
+    showError('errorBox4', 'Video bahut badi hai. 25MB se chhoti video daalein.');
+    return;
+  }
+
+  const wrap = document.getElementById('mediaPreviewWrap');
+  const img  = document.getElementById('photoPreview');
+  const vid  = document.getElementById('videoPreview');
+  const nextBtn = document.getElementById('mediaNextBtn');
+
+  // Show a local instant preview (object URL, not the upload itself) while
+  // the real upload happens in the background — feels responsive on slow data.
+  const localPreviewUrl = URL.createObjectURL(file);
+  wrap.classList.remove('hidden');
+  if (type === 'photo') {
+    img.src = localPreviewUrl; img.classList.remove('hidden'); vid.classList.add('hidden');
+    document.getElementById('photoOption').classList.add('selected');
+  } else {
+    vid.src = localPreviewUrl; vid.classList.remove('hidden'); img.classList.add('hidden');
+    document.getElementById('videoOption').classList.add('selected');
+  }
+
+  mediaUploading = true;
+  mediaUrl = '';
+  mediaType = type;
+  nextBtn.disabled = true;
+  showToast('⏳ Upload ho raha hai...');
+
+  try {
+    const cloudName = ROSKYRO_CONFIG.CLOUDINARY_CLOUD_NAME;
+    const preset = ROSKYRO_CONFIG.CLOUDINARY_UPLOAD_PRESET;
+    const resourceType = type === 'video' ? 'video' : 'image';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', preset);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (!data.secure_url) {
+      throw new Error(data.error?.message || 'Upload failed');
+    }
+
+    mediaUrl = data.secure_url;
+    document.getElementById('consentRow').classList.remove('hidden');
+    showToast(type === 'photo' ? '📷 +30 Points kamaye!' : '🎥 +50 Points kamaye!', 2500);
+  } catch (err) {
+    showError('errorBox4', 'Media upload nahi ho saka. Phir koshish karein ya skip karein.');
+    mediaUrl = '';
+    mediaType = '';
+    wrap.classList.add('hidden');
+    document.getElementById('consentRow').classList.add('hidden');
+  } finally {
+    mediaUploading = false;
+    nextBtn.disabled = false;
+  }
+}
+
+function skipMedia() {
+  mediaUrl  = '';
+  mediaType = '';
+  goToStep(5);
+}
+
+/* ── GOOGLE REVIEW CLICK TRACKING ────────────────── */
+function markGoogleClick() {
+  // Called after submit when we have the referral code
+  // (see showSuccess — pass the code returned from backend)
+}
+function markGoogleClickByCode(referralCode) {
+  if (!referralCode) return;
+  safeFetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'markGoogleReviewClicked', businessId: BUSINESS_ID, referralCode: referralCode })
+  }).catch(() => {});
+}
+
+/* ── SUBMIT: POSITIVE ────────────────────────────── */
+async function submitPositive() {
+  if (submitting) return;
+
+  const name     = document.getElementById('customerName').value.trim();
+  const phone    = document.getElementById('customerPhone').value.trim();
+  const social   = document.getElementById('socialMediaId').value.trim();
+  const feedback = document.getElementById('feedbackTextPositive').value.trim() || 'Positive review';
+  const referral = document.getElementById('referralCodeInput').value.trim().toUpperCase();
+  const errBox   = document.getElementById('errorBox3p');
+  clearError(errBox);
+
+  setBtnLoading('submitPositiveBtn', true, 'Submit ho raha hai...');
+  submitting = true;
+
+  const payload = {
+    action: 'submitFeedback',
+    businessId: BUSINESS_ID,
+    customerName: name,
+    customerPhone: phone,
+    socialMediaId: social,
+    rating: selectedRating,
+    feedback: feedback,
+    referredBy: referral || REFERRED_BY
+  };
+  if (mediaType === 'photo' && mediaUrl) {
+    payload.photoUrl = mediaUrl;
+    payload.consentToShare = document.getElementById('consentCheck')?.checked ? 'Yes' : 'No';
+  }
+  if (mediaType === 'video' && mediaUrl) {
+    payload.videoUrl = mediaUrl;
+    payload.consentToShare = document.getElementById('consentCheck')?.checked ? 'Yes' : 'No';
+  }
+
+  try {
+    const res  = await safeFetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.success) {
+      showSuccess(data, true);
+    } else if (data.error === 'ALREADY_REVIEWED') {
+      showError(errBox, data.message || 'Aap pehle hi review de chuke hain.');
+      setBtnLoading('submitPositiveBtn', false, 'Submit Karein ✓');
+    } else {
+      throw new Error(data.error || 'failed');
+    }
+  } catch (err) {
+    showError(errBox, 'Kuch gadbad hui: ' + (err.message || 'Dobara try karein.'));
+    setBtnLoading('submitPositiveBtn', false, 'Submit Karein ✓');
+  } finally {
+    submitting = false;
+  }
+}
+
+/* ── SUBMIT: NEGATIVE ────────────────────────────── */
+async function submitNegative() {
+  if (submitting) return;
+
+  const name    = document.getElementById('customerName').value.trim();
+  const phone   = document.getElementById('customerPhone').value.trim();
+  const other   = document.getElementById('complaintDetails').value.trim();
+  const errBox  = document.getElementById('errorBox3n');
+  clearError(errBox);
+
+  if (selectedComplaints.length === 0 && !other) {
+    showError(errBox, 'Kripya ek option select karein ya kuch likhein.');
+    return;
+  }
+
+  const complaintText = [
+    ...selectedComplaints.filter(c => c !== 'Other'),
+    ...(other ? [`Other: ${other}`] : [])
+  ].join(', ');
+
+  setBtnLoading('submitNegativeBtn', true, 'Submit ho raha hai...');
+  submitting = true;
+
+  try {
+    await safeFetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'submitComplaint', businessId: BUSINESS_ID,
+        customerName: name, customerPhone: phone,
+        rating: selectedRating, complaintDetails: complaintText
+      })
+    });
+
+    const referral = document.getElementById('referralCodeInput').value.trim().toUpperCase();
+    const res  = await safeFetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'submitFeedback', businessId: BUSINESS_ID,
+        customerName: name, customerPhone: phone,
+        socialMediaId: document.getElementById('socialMediaId').value.trim(),
+        rating: selectedRating, feedback: complaintText,
+        referredBy: referral || REFERRED_BY
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showSuccess(data, false);
+    } else {
+      throw new Error('failed');
+    }
+  } catch {
+    showError(errBox, 'Kuch gadbad hui. Dobara try karein.');
+    setBtnLoading('submitNegativeBtn', false, 'Submit Karein');
+  } finally {
+    submitting = false;
+  }
+}
+
+/* ── FINAL SUBMIT (from referral screen) ─────────── */
+async function submitFinal() {
+  // Already submitted — just go to success or submit now
+  if (selectedRating >= 4) {
+    await submitPositive();
+  } else {
+    await submitNegative();
+  }
+}
+
+function skipReferralAndSubmit() {
+  document.getElementById('referralCodeInput').value = '';
+  submitFinal();
+}
+
+/* ── SHOW SUCCESS SCREEN ─────────────────────────── */
+async function showSuccess(data, isPositive) {
+  // Confetti!
+  launchConfetti();
+
+  // Navigate to success screen
+  const allScreens = document.querySelectorAll('.screen');
+  allScreens.forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const successScreen = document.getElementById('screen-6');
+  successScreen.style.display = '';
+  successScreen.classList.add('active');
+  currentStep = 6;
+  updateProgress(6);
+
+  // Points
+  pointsEarned = data.pointsEarned || 20;
+  document.getElementById('ptsEarnedDisplay').textContent = `+${pointsEarned}`;
+  // Update dynamic pts display and inline msg
+  const ptsDisp = document.getElementById('successPtsDisplay');
+  if (ptsDisp) ptsDisp.textContent = `+${pointsEarned}`;
+  const ptsMsg = document.getElementById('successPtsMsg');
+  if (ptsMsg) ptsMsg.textContent = `+${pointsEarned}`;
+
+  // Breakdown tags
+  const breakdown = document.getElementById('ptsBreakdown');
+  breakdown.innerHTML = '';
+  const addTag = (label) => {
+    const tag = document.createElement('div');
+    tag.className = 'pts-tag';
+    tag.textContent = label;
+    breakdown.appendChild(tag);
+  };
+  addTag('⭐ Review');
+  if (mediaType === 'photo') addTag('📷 Photo');
+  if (mediaType === 'video') addTag('🎥 Video');
+  if (data.referralBonusGiven) addTag('🎁 Referral');
+
+  // Message
+  document.getElementById('successMsg').textContent = isPositive
+    ? `Aapka review hamare liye bahut important hai. Aapko +${pointsEarned} Points mile!`
+    : 'Aapki baat humein sunne ko mili. Hum zaroor sudhar karenge. Shukriya!';
+
+  // Referral code
+  if (data.referralCode) {
+    document.getElementById('referralCodeDisplay').textContent = data.referralCode;
+    document.getElementById('referralBlock').classList.remove('hidden');
+  }
+
+  // WhatsApp
+  const bizName   = businessData.businessName || 'ROSKYRO';
+  const waMessage = `Namaste! Maine "${bizName}" ko review kiya. Mera referral code hai: *${data.referralCode}* — Visit karo aur dono ko bonus points milenge! 🎁`;
+  document.getElementById('whatsappShareBtn').href = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
+  document.getElementById('whatsappShareBtn').classList.remove('hidden');
+
+  // Google button on success screen
+  if (isPositive && businessData.googleReviewLink) {
+    const gBtn = document.getElementById('googleReviewFinalBtn');
+    gBtn.href = businessData.googleReviewLink;
+    gBtn.onclick = () => markGoogleClickByCode(data.referralCode);
+    gBtn.classList.remove('hidden');
+  }
+
+  // Tier unlock
+  const phone = document.getElementById('customerPhone').value.trim();
+  if (phone) {
+    try {
+      const balRes  = await safeFetch(`${SCRIPT_URL}?action=checkPointsBalance&businessId=${BUSINESS_ID}&phone=${phone}`);
+      const balData = await balRes.json();
+      if (balData.success && balData.unlockedTiers && balData.unlockedTiers.length > 0) {
+        const topTier = balData.unlockedTiers[balData.unlockedTiers.length - 1];
+        document.getElementById('tierUnlockReward').textContent = `${topTier.points}+ Points → ${topTier.reward}`;
+        document.getElementById('tierUnlockBlock').classList.remove('hidden');
+      }
+    } catch { /* silent */ }
+  }
+}
+
+/* ── REFERRAL COPY ───────────────────────────────── */
+function copyReferral() {
+  const code = document.getElementById('referralCodeDisplay').textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => showToast('📋 Code copy ho gaya!'));
+  } else {
+    showToast('📋 ' + code);
+  }
+}
+
+/* ── CONFETTI ────────────────────────────────────── */
+function launchConfetti() {
+  const colours = ['#1a4029','#c07c2a','#22c55e','#e8c97a','#fff'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left: ${Math.random() * 100}vw;
+      background: ${colours[Math.floor(Math.random() * colours.length)]};
+      animation-delay: ${Math.random() * 1}s;
+      animation-duration: ${1.5 + Math.random() * 1.5}s;
+      transform: rotate(${Math.random() * 360}deg);
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+}
+
+/* ── POINTS TOAST ────────────────────────────────── */
+function showToast(msg, duration = 2000) {
+  const toast = document.getElementById('pointsToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+/* ── HELPERS ─────────────────────────────────────── */
+function showError(elOrId, msg) {
+  const el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+function clearError(elOrId) {
+  const el = typeof elOrId === 'string' ? document.getElementById(elOrId) : elOrId;
+  if (!el) return;
+  el.classList.add('hidden');
+}
+function setBtnLoading(id, loading, text) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading ? `<span class="spinner"></span>${text}` : text;
+}
+
+/* ── BUTTON RIPPLE ───────────────────────────────── */
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-primary');
+  if (!btn) return;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  const rect = btn.getBoundingClientRect();
+  ripple.style.left = (e.clientX - rect.left) + 'px';
+  ripple.style.top  = (e.clientY - rect.top)  + 'px';
+  btn.style.position = 'relative';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+});
+
+/* ── PHONE INPUT — NUMBERS ONLY ──────────────────── */
+document.getElementById('customerPhone').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 10);
+});
+
+/* ── REFERRAL CODE — UPPERCASE ───────────────────── */
+document.getElementById('referralCodeInput').addEventListener('input', function() {
+  this.value = this.value.toUpperCase();
+});
+
+/* ── AUTO SAVE (localStorage) ────────────────────── */
+const SAVE_KEY = `roskyro_draft_${BUSINESS_ID}`;
+function saveDraft() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      name:    document.getElementById('customerName').value,
+      phone:   document.getElementById('customerPhone').value,
+      social:  document.getElementById('socialMediaId').value,
+      step:    currentStep,
+      rating:  selectedRating,
+    }));
+  } catch {}
+}
+function restoreDraft() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+    if (!saved) return;
+    if (saved.name)   document.getElementById('customerName').value  = saved.name;
+    if (saved.phone)  document.getElementById('customerPhone').value = saved.phone;
+    if (saved.social) document.getElementById('socialMediaId').value  = saved.social;
+  } catch {}
+}
+restoreDraft();
+['customerName','customerPhone','socialMediaId'].forEach(id => {
+  document.getElementById(id).addEventListener('input', saveDraft);
+});
+</script>
+
+</body>
+</html>

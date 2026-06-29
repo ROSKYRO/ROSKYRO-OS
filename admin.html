@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROSKYRO-OS | Admin Dashboard</title>
+<style>
+  :root {
+    --ink: #1a2f23; --paper: #f7f4ec; --moss: #3d5c45; --moss-deep: #28402f;
+    --gold: #c08a3e; --gold-soft: #e8d4ab; --line: #d8d0bb; --white: #ffffff;
+    --warm-red: #b5544a; --warm-red-soft: #f3dcd8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--paper); color: var(--ink); padding: 20px 16px 60px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 8px; }
+  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+  .brand img { width: 28px; height: 28px; border-radius: 6px; }
+  .brand-text { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; color: var(--moss-deep); }
+
+  .renewal-warn { background: #fde8e8; color: #a33; }
+  .renewal-soon { background: #fff3d6; color: #8a6b1d; }
+  .renewal-ok { background: #e3ebe5; color: var(--moss-deep); }
+
+  .biz-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 10px;
+  }
+  .biz-card.renewal-alert { border-left: 4px solid var(--warm-red); }
+  .biz-card-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .biz-card-name { font-size: 16px; font-weight: 700; }
+  .biz-card-type { font-size: 12px; color: #8a8265; margin-top: 2px; }
+  .biz-meta-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #6b6450; margin-bottom: 10px; }
+  .biz-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .biz-meta-label { font-size: 11px; color: #9a9378; font-weight: 600; text-transform: uppercase; }
+  .edit-sub-btn {
+    font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 6px; cursor: pointer;
+    background: var(--moss-deep); color: white; border: none;
+  }
+  .add-biz-btn {
+    background: var(--gold); color: white; border: none; border-radius: 8px;
+    padding: 9px 16px; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+
+  .service-row {
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+    padding: 12px 14px; background: var(--white); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 8px;
+  }
+  .service-name { font-weight: 700; font-size: 14px; }
+  .service-cat { font-size: 11px; color: #8a8265; }
+  .service-price { font-weight: 700; color: var(--moss-deep); font-size: 14px; }
+  .service-status-active { background: #e3ebe5; color: var(--moss-deep); padding: 3px 10px; border-radius: 14px; font-size: 11px; font-weight: 700; }
+  .service-status-inactive { background: #f0ece0; color: #9a9378; padding: 3px 10px; border-radius: 14px; font-size: 11px; font-weight: 700; }
+  .remove-service-btn { background: none; border: 1px solid var(--warm-red); color: var(--warm-red); border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+
+  .catalog-category { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--moss); margin: 16px 0 8px; letter-spacing: 0.04em; }
+  .catalog-item {
+    display: flex; justify-content: space-between; align-items: center; padding: 10px 14px;
+    background: var(--paper); border-radius: 8px; margin-bottom: 6px; cursor: pointer; border: 1.5px solid transparent;
+  }
+  .catalog-item:hover { border-color: var(--gold); }
+  .catalog-item-name { font-size: 13px; font-weight: 600; }
+  .catalog-item-price { font-size: 13px; font-weight: 700; color: var(--moss-deep); }
+  .catalog-item-add { font-size: 11px; font-weight: 700; color: white; background: var(--moss); padding: 4px 10px; border-radius: 6px; }
+
+  .modal-box.wide { max-width: 600px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .form-field label { display: block; font-size: 12px; font-weight: 600; color: var(--moss-deep); margin-bottom: 5px; }
+  .form-field input, .form-field select {
+    width: 100%; padding: 9px 11px; border: 1.5px solid var(--line); border-radius: 7px; font-size: 13px;
+  }
+  .modal-save-btn { width: 100%; padding: 12px; background: var(--moss-deep); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+  .biz-selector { display: flex; gap: 8px; align-items: center; }
+  .biz-selector input { padding: 9px 12px; border: 1.5px solid var(--line); border-radius: 8px; font-size: 14px; width: 160px; }
+  .biz-selector button { padding: 9px 16px; background: var(--moss-deep); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+  .tabs-nav { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1.5px solid var(--line); }
+  .tab-btn { padding: 10px 16px; font-size: 13px; font-weight: 700; color: #8a8265; cursor: pointer; border-bottom: 2px solid transparent; }
+  .tab-btn.active { color: var(--moss-deep); border-bottom-color: var(--gold); }
+
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .stat-card { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 16px 16px; }
+  .stat-number { font-size: 26px; font-weight: 800; color: var(--moss-deep); }
+  .stat-label { font-size: 11px; color: #8a8265; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 4px; }
+
+  .section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--moss); margin-bottom: 12px; margin-top: 8px; }
+
+  .feedback-list { display: flex; flex-direction: column; gap: 10px; }
+  .feedback-card { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .feedback-card.complaint { border-left: 4px solid var(--warm-red); }
+  .feedback-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
+  .customer-name { font-weight: 700; font-size: 15px; }
+  .rating-display { color: var(--gold); font-size: 13px; }
+  .feedback-date { font-size: 12px; color: #9a9378; }
+  .feedback-text { font-size: 14px; color: #3a3528; line-height: 1.5; margin-bottom: 10px; }
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tag { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: var(--paper); color: var(--moss-deep); }
+  .tag.referral { background: var(--gold-soft); color: #7a5520; }
+  .tag.phone { background: #e3ebe5; }
+  .tag.points { background: #fef3d9; color: #8a6b1d; }
+  .tag.media { background: #e3e8f5; color: #2e4a8a; }
+  .tag.status-new { background: var(--warm-red-soft); color: var(--warm-red); }
+  .media-link { font-size: 12px; color: var(--moss); text-decoration: underline; }
+
+  .gen-image-btn { margin-top: 10px; font-size: 12px; font-weight: 700; color: white; background: var(--moss-deep); border: none; border-radius: 6px; padding: 7px 14px; cursor: pointer; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: #9a9378; }
+  .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+  .loading-state { text-align: center; padding: 40px; color: #9a9378; }
+
+  .setup-note { background: #fff8e8; border: 1px solid var(--gold-soft); border-radius: 10px; padding: 14px 16px; font-size: 13px; color: #6b5a30; margin-bottom: 20px; line-height: 1.5; }
+  .setup-note code { background: rgba(0,0,0,0.06); padding: 2px 5px; border-radius: 4px; font-size: 12px; }
+
+  /* Report tab */
+  .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .report-card { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 18px; text-align: center; }
+  .report-number { font-size: 30px; font-weight: 800; color: var(--moss-deep); }
+  .report-label { font-size: 12px; color: #8a8265; font-weight: 600; margin-top: 4px; }
+  .testimonial-card { background: var(--white); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; }
+  .testimonial-card .rating-display { display: block; margin-bottom: 4px; }
+
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(26,47,35,0.55); align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-overlay.active { display: flex; }
+  .modal-box { background: white; border-radius: 16px; padding: 20px; max-width: 420px; width: 100%; }
+  .modal-close { text-align: right; }
+  .modal-close button { background: none; border: none; font-size: 18px; cursor: pointer; color: #9a9378; }
+  #testimonialCanvas {
+    width: 100%; aspect-ratio: 1/1; border-radius: 14px; overflow: hidden; position: relative;
+    background: linear-gradient(135deg, var(--moss-deep), var(--moss));
+    display: flex; flex-direction: column; justify-content: space-between; padding: 28px;
+    color: white; font-family: 'Segoe UI', sans-serif;
+  }
+  .tc-quote-mark { font-size: 50px; opacity: 0.3; line-height: 1; font-weight: 800; }
+  .tc-quote-text { font-size: 19px; font-weight: 600; line-height: 1.45; flex: 1; display: flex; align-items: center; }
+  .tc-stars { color: var(--gold); font-size: 18px; margin-bottom: 8px; }
+  .tc-author { font-size: 15px; font-weight: 700; }
+  .tc-brand { display: flex; align-items: center; gap: 6px; font-size: 11px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .tc-brand .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  .download-btn { width: 100%; margin-top: 14px; padding: 12px; background: var(--moss-deep); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; }
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+
+<!-- No login gate -->
+
+<div class="wrap" id="mainWrap">
+  <div class="topbar">
+    <div class="brand"><img src="data:image/png;base64,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" alt="ROSKYRO-OS Logo" style="width:28px;height:28px;border-radius:6px;object-fit:cover;"><span class="brand-text">ROSKYRO-OS</span></div>
+    <div class="biz-selector">
+      <input type="text" id="bizIdInput" placeholder="Business ID (e.g. DEMO001)">
+      <button id="loadBtn">Load Data</button>
+    </div>
+  </div>
+
+  <div class="setup-note">
+    <strong>Setup pending?</strong> Apps Script URL <code>SCRIPT_URL</code> variable mein paste karein. Business ID daal kar "Load Data" dabayein.
+  </div>
+
+  <div class="tabs-nav">
+    <div class="tab-btn active" data-tab="businesses">Businesses</div>
+    <div class="tab-btn" data-tab="reviews">Reviews</div>
+    <div class="tab-btn" data-tab="complaints">Complaints</div>
+    <div class="tab-btn" data-tab="services">Services</div>
+    <div class="tab-btn" data-tab="report">Monthly Report</div>
+  </div>
+
+  <!-- BUSINESSES TAB (Subscription & Renewal Management) -->
+  <div id="businessesTab">
+    <div class="biz-card-top" style="margin-bottom:16px;">
+      <div class="section-title" style="margin:0;">Sab Clients</div>
+      <button class="add-biz-btn" id="addBizBtn">+ Naya Client Add Karein</button>
+    </div>
+    <div id="businessesList"><div class="loading-state">Load ho raha hai...</div></div>
+  </div>
+
+  <!-- REVIEWS TAB -->
+  <div id="reviewsTab" class="hidden">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number" id="totalFeedback">—</div><div class="stat-label">Total Reviews</div></div>
+      <div class="stat-card"><div class="stat-number" id="totalReferrals">—</div><div class="stat-label">Referrals</div></div>
+      <div class="stat-card"><div class="stat-number" id="avgRating">—</div><div class="stat-label">Avg Rating</div></div>
+      <div class="stat-card"><div class="stat-number" id="withMedia">—</div><div class="stat-label">Photo/Video</div></div>
+    </div>
+    <div class="section-title">Sab Reviews (Latest Pehle)</div>
+    <div id="feedbackList" class="feedback-list"><div class="loading-state">Business ID daal kar data load karein</div></div>
+  </div>
+
+  <!-- COMPLAINTS TAB -->
+  <div id="complaintsTab" class="hidden">
+    <div class="section-title">Complaints (1-3 Star Reviews)</div>
+    <div id="complaintsList" class="feedback-list"><div class="loading-state">Load karein</div></div>
+  </div>
+
+  <!-- SERVICES TAB -->
+  <div id="servicesTab" class="hidden">
+    <div class="biz-card-top" style="margin-bottom:16px;">
+      <div class="section-title" style="margin:0;">Active Services (Selected Business)</div>
+      <button class="add-biz-btn" id="addServiceBtn">+ Add More Services</button>
+    </div>
+    <div id="activeServicesList"><div class="loading-state">Business ID select karke load karein</div></div>
+  </div>
+
+  <!-- REPORT TAB -->
+  <div id="reportTab" class="hidden">
+    <div class="section-title">Is Mahine Ka Report</div>
+    <div class="report-grid" id="reportGrid">
+      <div class="loading-state">Load karein</div>
+    </div>
+    <div class="section-title">Top Testimonials</div>
+    <div id="topTestimonialsList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-close"><button onclick="closeModal()">✕ Close</button></div>
+    <div id="testimonialCanvas">
+      <div class="tc-quote-mark">"</div>
+      <div class="tc-quote-text" id="tcQuoteText"></div>
+      <div>
+        <div class="tc-stars" id="tcStars"></div>
+        <div class="tc-author" id="tcAuthor"></div>
+        <div class="tc-brand" style="margin-top:10px;"><span class="dot"></span><span id="tcBizName"></span></div>
+      </div>
+    </div>
+    <button class="download-btn" onclick="downloadImage()">⬇ Download Image (Social Media ke liye)</button>
+  </div>
+</div>
+
+<!-- ADD/EDIT BUSINESS MODAL -->
+<div class="modal-overlay" id="bizModalOverlay">
+  <div class="modal-box wide">
+    <div class="modal-close"><button onclick="closeBizModal()">✕ Close</button></div>
+    <div class="section-title" style="margin-top:0;">Naya Client Add Karein</div>
+    <div class="form-grid">
+      <div class="form-field"><label>Business ID (unique)</label><input type="text" id="newBizId" placeholder="e.g. DRSHARMA001"></div>
+      <div class="form-field"><label>Business Naam</label><input type="text" id="newBizName" placeholder="e.g. Dr. Sharma Dental Clinic"></div>
+      <div class="form-field"><label>Business Type</label><input type="text" id="newBizType" placeholder="e.g. Dental Clinic"></div>
+      <div class="form-field"><label>Admin Phone</label><input type="text" id="newBizPhone" placeholder="10 digit number"></div>
+      <div class="form-field" style="grid-column: 1 / -1;"><label>Google Review Link</label><input type="text" id="newBizReviewLink" placeholder="https://g.page/r/.../review"></div>
+      <div class="form-field"><label>Subscription Start Date</label><input type="date" id="newBizStartDate"></div>
+      <div class="form-field"><label>Renewal Date</label><input type="date" id="newBizRenewalDate"></div>
+      <div class="form-field"><label>Monthly Fee (₹)</label><input type="number" id="newBizFee" placeholder="3000"></div>
+      <div class="form-field">
+        <label>Status</label>
+        <select id="newBizStatus"><option value="Active">Active</option><option value="Trial">Trial</option><option value="Paused">Paused</option></select>
+      </div>
+    </div>
+    <button class="modal-save-btn" id="saveBizBtn">Client Save Karein</button>
+  </div>
+</div>
+
+<!-- ADD SERVICE MODAL -->
+<div class="modal-overlay" id="serviceModalOverlay">
+  <div class="modal-box wide">
+    <div class="modal-close"><button onclick="closeServiceModal()">✕ Close</button></div>
+    <div class="section-title" style="margin-top:0;">Service Catalog — Add More Services</div>
+    <div id="serviceCatalogList"><div class="loading-state">Load ho raha hai...</div></div>
+  </div>
+</div>
+
+<!-- REWARD TIERS MODAL -->
+<div class="modal-overlay" id="tiersModalOverlay">
+  <div class="modal-box wide">
+    <div class="modal-close"><button onclick="closeTiersModal()">✕ Close</button></div>
+    <div class="section-title" style="margin-top:0;">Reward Tiers — <span id="tiersBizName"></span></div>
+    <div style="font-size:13px; color:#6b6450; margin-bottom:14px; line-height:1.5;">
+      Customer ke points jab is threshold ko cross karein, unhe ye reward unlock hone ka message dikhega. Aap apne hisaab se koi bhi reward likh sakte hain.
+    </div>
+    <div id="tiersList" style="margin-bottom:16px;"></div>
+    <div class="form-grid" style="grid-template-columns: 1fr 2fr auto;">
+      <div class="form-field"><label>Points Required</label><input type="number" id="newTierPoints" placeholder="1000"></div>
+      <div class="form-field"><label>Reward</label><input type="text" id="newTierReward" placeholder="Free consultation"></div>
+      <div class="form-field" style="display:flex; align-items:flex-end;"><button class="modal-save-btn" style="margin-top:0;" onclick="addTierRow()">+ Add</button></div>
+    </div>
+    <button class="modal-save-btn" id="saveTiersBtn">Tiers Save Karein</button>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = (typeof ROSKYRO_CONFIG !== "undefined" && ROSKYRO_CONFIG.APPS_SCRIPT_URL) ? ROSKYRO_CONFIG.APPS_SCRIPT_URL : "https://script.google.com/macros/s/AKfycbyY3hjXfMZ3jGfp1Tfc_GhiBdk-KGSUYLwAg3X7BtWCng5v99APWRTB8dP4VSW1YG-Q/exec";
+  let lastBizName = "";
+  let currentBizId = "";
+
+  // Fetch wrapper — Apps Script ke saath safe defaults:
+  // - text/plain content-type (POST par CORS preflight avoid karta hai, Apps Script
+  //   automatically e.postData.contents se JSON parse kar leta hai)
+  // - redirect: 'follow' (Apps Script /exec URLs kabhi-kabhi 302 redirect dete hain
+  //   googleusercontent.com par; fetch ko explicitly follow karna chahiye)
+  // - response status + body dono check karte hain taaki "Failed to fetch" ke jagah
+  //   asli wajah pata chale
+  async function adminFetch(url, options) {
+    var opts = Object.assign({ redirect: 'follow' }, options || {});
+    if (opts.method === 'POST') {
+      opts.headers = Object.assign({ 'Content-Type': 'text/plain;charset=utf-8' }, opts.headers || {});
+    }
+    var res;
+    try {
+      res = await fetch(url, opts);
+    } catch (networkErr) {
+      // True network failure — DNS, CORS block, offline, mixed content, etc.
+      throw new Error('Network error: server tak request pahunchi hi nahi. Internet check karein ya Apps Script URL verify karein. (' + networkErr.message + ')');
+    }
+    if (!res.ok) {
+      var bodyText = '';
+      try { bodyText = await res.text(); } catch (e) {}
+      throw new Error('Server ne error diya (HTTP ' + res.status + '). ' + (bodyText ? bodyText.slice(0, 200) : 'Apps Script deployment check karein.'));
+    }
+    return res;
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ['businessesTab','reviewsTab','complaintsTab','servicesTab','reportTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById(btn.dataset.tab + 'Tab').classList.remove('hidden');
+
+      if (btn.dataset.tab === 'businesses') loadBusinessesList();
+      if (btn.dataset.tab === 'complaints' && currentBizId) loadComplaints();
+      if (btn.dataset.tab === 'report' && currentBizId) loadReport();
+      if (btn.dataset.tab === 'services' && currentBizId) loadActiveServices();
+    });
+  });
+
+  document.getElementById('loadBtn').addEventListener('click', loadData);
+  document.getElementById('bizIdInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') loadData(); });
+
+  async function loadData() {
+    const bizId = document.getElementById('bizIdInput').value.trim();
+    currentBizId = bizId;
+    const list = document.getElementById('feedbackList');
+    list.innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
+
+    try {
+      const bizRes = await adminFetch(`${SCRIPT_URL}?action=getBusiness&businessId=${bizId}`);
+      const bizData = await bizRes.json();
+      lastBizName = bizData.businessName || bizId;
+
+      const url = bizId ? `${SCRIPT_URL}?action=getAllFeedback&businessId=${bizId}` : `${SCRIPT_URL}?action=getAllFeedback`;
+      const res = await adminFetch(url);
+      const data = await res.json();
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div>Abhi tak koi feedback nahi aaya.</div>`;
+        updateStats(0, 0, 0, 0);
+        return;
+      }
+
+      const rows = data.data.reverse();
+      const ratings = rows.map(r => Number(r.rating)).filter(r => !isNaN(r) && r > 0);
+      const avgRating = ratings.length ? (ratings.reduce((a,b) => a+b, 0) / ratings.length).toFixed(1) : '—';
+
+      updateStats(rows.length, rows.filter(r => r.referredBy).length, avgRating, rows.filter(r => r.photoLink || r.videoLink).length);
+
+      list.innerHTML = rows.map(row => `
+        <div class="feedback-card">
+          <div class="feedback-top">
+            <span class="customer-name">${escapeHtml(row.customerName)} ${row.rating ? `<span class="rating-display">${'⭐'.repeat(Number(row.rating))}</span>` : ''}</span>
+            <span class="feedback-date">${new Date(row.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}</span>
+          </div>
+          <div class="feedback-text">${escapeHtml(row.feedback)}</div>
+          <div class="tag-row">
+            <span class="tag points">+${row.pointsEarned || 0} pts (${row.reviewType || 'Text'})</span>
+            <span class="tag">Code: ${row.referralCode}</span>
+            ${row.referredBy ? `<span class="tag referral">Ref by: ${row.referredBy}</span>` : ''}
+            ${row.customerPhone ? `<span class="tag phone">📱 ${row.customerPhone}</span>` : ''}
+            ${row.photoLink ? `<a href="${row.photoLink}" target="_blank" class="tag media">📷 Photo</a>` : ''}
+            ${row.videoLink ? `<a href="${row.videoLink}" target="_blank" class="tag media">🎥 Video</a>` : ''}
+            ${(row.photoLink || row.videoLink) ? (row.consentToShare === 'Yes' ? `<span class="tag" style="background:#dcfce7;color:#15803d;">✓ Shareable</span>` : `<span class="tag" style="background:#f3f4f6;color:#6b7280;">Not for sharing</span>`) : ''}
+            <button class="gen-image-btn" onclick='openModal(${JSON.stringify(row.customerName)}, ${JSON.stringify(row.feedback)}, ${row.rating || 5})'>🎨 Image Banao</button>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state">Data load nahi ho paya. SCRIPT_URL check karein.</div>`;
+    }
+  }
+
+  async function loadComplaints() {
+    const list = document.getElementById('complaintsList');
+    list.innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
+    try {
+      const res = await adminFetch(`${SCRIPT_URL}?action=getAllComplaints&businessId=${currentBizId}`);
+      const data = await res.json();
+      if (!data.success || !data.data || data.data.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✅</div>Koi complaint nahi hai abhi.</div>`;
+        return;
+      }
+      const rows = data.data.reverse();
+      list.innerHTML = rows.map(row => `
+        <div class="feedback-card complaint">
+          <div class="feedback-top">
+            <span class="customer-name">${escapeHtml(row.customerName)} <span class="rating-display">${'⭐'.repeat(Number(row.rating) || 0)}</span></span>
+            <span class="feedback-date">${new Date(row.timestamp).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'})}</span>
+          </div>
+          <div class="feedback-text">${escapeHtml(row.complaintDetails)}</div>
+          <div class="tag-row">
+            ${row.customerPhone ? `<span class="tag phone">📱 ${row.customerPhone}</span>` : ''}
+            <span class="tag status-new">${row.status || 'New'}</span>
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state">Load nahi hua.</div>`;
+    }
+  }
+
+  async function loadReport() {
+    const grid = document.getElementById('reportGrid');
+    grid.innerHTML = '<div class="loading-state">Generate ho raha hai...</div>';
+    try {
+      const res = await adminFetch(`${SCRIPT_URL}?action=getMonthlyReport&businessId=${currentBizId}`);
+      const data = await res.json();
+      if (!data.success) { grid.innerHTML = '<div class="empty-state">Report nahi mila.</div>'; return; }
+
+      grid.innerHTML = `
+        <div class="report-card"><div class="report-number">${data.totalReviews}</div><div class="report-label">Total Reviews</div></div>
+        <div class="report-card"><div class="report-number">${data.totalPoints}</div><div class="report-label">Points Issued</div></div>
+        <div class="report-card"><div class="report-number">${data.totalReferrals}</div><div class="report-label">Referrals</div></div>
+        <div class="report-card"><div class="report-number">${data.googleReviewClicks}</div><div class="report-label">Google Reviews</div></div>
+        <div class="report-card"><div class="report-number">${data.avgRating}</div><div class="report-label">Avg Rating</div></div>
+        <div class="report-card"><div class="report-number">${data.totalComplaints}</div><div class="report-label">Complaints</div></div>
+      `;
+
+      const testimonialsDiv = document.getElementById('topTestimonialsList');
+      if (data.topTestimonials && data.topTestimonials.length) {
+        testimonialsDiv.innerHTML = data.topTestimonials.map(t => `
+          <div class="testimonial-card">
+            <span class="rating-display">${'⭐'.repeat(Number(t.rating))}</span>
+            <div class="feedback-text">"${escapeHtml(t.feedback)}"</div>
+            <div style="font-size:13px; font-weight:600; color:var(--moss-deep);">— ${escapeHtml(t.name)}</div>
+          </div>
+        `).join('');
+      } else {
+        testimonialsDiv.innerHTML = '<div class="empty-state">Is mahine koi top testimonial nahi.</div>';
+      }
+    } catch (err) {
+      grid.innerHTML = '<div class="empty-state">Load nahi hua.</div>';
+    }
+  }
+
+  function updateStats(total, referrals, avgRating, media) {
+    document.getElementById('totalFeedback').textContent = total;
+    document.getElementById('totalReferrals').textContent = referrals;
+    document.getElementById('avgRating').textContent = avgRating;
+    document.getElementById('withMedia').textContent = media;
+  }
+
+  function openModal(name, feedback, rating) {
+    document.getElementById('tcQuoteText').textContent = feedback;
+    document.getElementById('tcStars').textContent = '⭐'.repeat(Number(rating) || 5);
+    document.getElementById('tcAuthor').textContent = '— ' + name;
+    document.getElementById('tcBizName').textContent = lastBizName;
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+  function downloadImage() { alert('Tip: Screenshot le lein abhi. Future version mein direct PNG download button add hoga.'); }
+  function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str || ''; return div.innerHTML; }
+
+  // ================= BUSINESSES TAB (Subscription Management) =================
+
+  async function loadBusinessesList() {
+    const list = document.getElementById('businessesList');
+    list.innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
+    try {
+      const res = await adminFetch(`${SCRIPT_URL}?action=getAllBusinesses`);
+      const data = await res.json();
+      if (!data.success || !data.data || data.data.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏢</div>Koi client add nahi hua abhi. "+ Naya Client Add Karein" dabayein.</div>`;
+        return;
+      }
+      list.innerHTML = data.data.map(biz => {
+        const daysLeft = biz.daysUntilRenewal;
+        let renewalTag = '<span class="tag renewal-ok">No renewal date set</span>';
+        let cardClass = 'biz-card';
+        if (daysLeft !== null) {
+          if (daysLeft < 0) { renewalTag = `<span class="tag renewal-warn">⚠ Expired ${Math.abs(daysLeft)} din pehle</span>`; cardClass += ' renewal-alert'; }
+          else if (daysLeft <= 7) { renewalTag = `<span class="tag renewal-warn">⚠ ${daysLeft} din mein renewal</span>`; cardClass += ' renewal-alert'; }
+          else if (daysLeft <= 15) { renewalTag = `<span class="tag renewal-soon">${daysLeft} din mein renewal</span>`; }
+          else { renewalTag = `<span class="tag renewal-ok">${daysLeft} din mein renewal</span>`; }
+        }
+        return `
+          <div class="${cardClass}">
+            <div class="biz-card-top">
+              <div>
+                <div class="biz-card-name">${escapeHtml(biz.businessName)}</div>
+                <div class="biz-card-type">${escapeHtml(biz.businessType)} · ID: ${biz.businessId}</div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="edit-sub-btn" onclick="selectBusinessForTabs('${biz.businessId}')">Select & View Data</button>
+                <button class="edit-sub-btn" style="background:var(--gold);" onclick="openTiersModal('${biz.businessId}', '${escapeHtml(biz.businessName)}')">🎁 Reward Tiers</button>
+              </div>
+            </div>
+            <div class="biz-meta-row">
+              <div class="biz-meta-item"><span class="biz-meta-label">Status</span><span>${biz.subscriptionStatus || '—'}</span></div>
+              <div class="biz-meta-item"><span class="biz-meta-label">Monthly Fee</span><span>₹${biz.monthlyFee || '—'}</span></div>
+              <div class="biz-meta-item"><span class="biz-meta-label">Start Date</span><span>${biz.subscriptionStartDate || '—'}</span></div>
+              <div class="biz-meta-item"><span class="biz-meta-label">Renewal Date</span><span>${biz.renewalDate || '—'}</span></div>
+            </div>
+            <div class="tag-row">${renewalTag}</div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state">Load nahi hua. SCRIPT_URL check karein.</div>`;
+    }
+  }
+
+  function selectBusinessForTabs(bizId) {
+    currentBizId = bizId;
+    document.getElementById('bizIdInput').value = bizId;
+
+    // Switch UI to Reviews tab
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="reviews"]').classList.add('active');
+    ['businessesTab','reviewsTab','complaintsTab','servicesTab','reportTab'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById('reviewsTab').classList.remove('hidden');
+
+    // Actually load the data, not just switch tabs
+    loadData();
+  }
+
+  document.getElementById('addBizBtn').addEventListener('click', () => {
+    document.getElementById('bizModalOverlay').classList.add('active');
+  });
+  function closeBizModal() { document.getElementById('bizModalOverlay').classList.remove('active'); }
+
+  document.getElementById('saveBizBtn').addEventListener('click', async () => {
+    const payload = {
+      action: 'addBusiness',
+      businessId: document.getElementById('newBizId').value.trim(),
+      businessName: document.getElementById('newBizName').value.trim(),
+      businessType: document.getElementById('newBizType').value.trim(),
+      adminPhone: document.getElementById('newBizPhone').value.trim(),
+      googleReviewLink: document.getElementById('newBizReviewLink').value.trim(),
+      subscriptionStartDate: document.getElementById('newBizStartDate').value,
+      renewalDate: document.getElementById('newBizRenewalDate').value,
+      monthlyFee: document.getElementById('newBizFee').value,
+      subscriptionStatus: document.getElementById('newBizStatus').value
+    };
+    if (!payload.businessId || !payload.businessName) {
+      alert('Business ID aur Naam zaroori hain.');
+      return;
+    }
+    const btn = document.getElementById('saveBizBtn');
+    btn.disabled = true; btn.textContent = 'Save ho raha hai...';
+    try {
+      const res = await adminFetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.success) {
+        closeBizModal();
+        loadBusinessesList();
+        ['newBizId','newBizName','newBizType','newBizPhone','newBizReviewLink','newBizStartDate','newBizRenewalDate','newBizFee'].forEach(id => document.getElementById(id).value = '');
+      } else {
+        alert('Save nahi hua, dobara try karein.');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+    btn.disabled = false; btn.textContent = 'Client Save Karein';
+  });
+
+  // ================= SERVICES TAB =================
+
+  async function loadActiveServices() {
+    const list = document.getElementById('activeServicesList');
+    if (!currentBizId) { list.innerHTML = '<div class="empty-state">Pehle Businesses tab se client select karein.</div>'; return; }
+    list.innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
+    try {
+      const res = await adminFetch(`${SCRIPT_URL}?action=getServiceCatalog&businessId=${currentBizId}`);
+      const data = await res.json();
+      if (!data.success || !data.data || data.data.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🧩</div>Koi service active nahi hai. "+ Add More Services" se add karein.</div>`;
+        return;
+      }
+      list.innerHTML = data.data.map(s => `
+        <div class="service-row">
+          <div>
+            <div class="service-name">${escapeHtml(s.serviceName)}</div>
+            <div class="service-cat">${escapeHtml(s.serviceCategory)} · ${s.billingCycle}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="service-price">₹${s.price}</span>
+            <span class="${s.status === 'Active' ? 'service-status-active' : 'service-status-inactive'}">${s.status}</span>
+            ${s.status === 'Active' ? `<button class="remove-service-btn" onclick="toggleServiceStatus('${escapeHtml(s.serviceName)}','Inactive')">Pause</button>` : `<button class="remove-service-btn" onclick="toggleServiceStatus('${escapeHtml(s.serviceName)}','Active')" style="border-color:var(--moss); color:var(--moss);">Resume</button>`}
+          </div>
+        </div>
+      `).join('');
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state">Load nahi hua.</div>`;
+    }
+  }
+
+  async function toggleServiceStatus(serviceName, newStatus) {
+    try {
+      await adminFetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'updateServiceStatus', businessId: currentBizId, serviceName: serviceName, status: newStatus })
+      });
+      loadActiveServices();
+    } catch (err) { alert('Update nahi hua.'); }
+  }
+
+  document.getElementById('addServiceBtn').addEventListener('click', async () => {
+    if (!currentBizId) { alert('Pehle Businesses tab se client select karein.'); return; }
+    document.getElementById('serviceModalOverlay').classList.add('active');
+    const list = document.getElementById('serviceCatalogList');
+    list.innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
+    try {
+      const res = await adminFetch(`${SCRIPT_URL}?action=getServicePricingMaster`);
+      const data = await res.json();
+      const grouped = {};
+      data.data.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
+      list.innerHTML = Object.keys(grouped).map(cat => `
+        <div class="catalog-category">${cat}</div>
+        ${grouped[cat].map(item => `
+          <div class="catalog-item" onclick='addServiceToClient(${JSON.stringify(item.name)}, ${JSON.stringify(item.category)}, ${item.price}, ${JSON.stringify(item.cycle)})'>
+            <span class="catalog-item-name">${item.name} <span style="color:#9a9378; font-weight:400;">(${item.cycle})</span></span>
+            <span style="display:flex; align-items:center; gap:8px;">
+              <span class="catalog-item-price">₹${item.price}</span>
+              <span class="catalog-item-add">+ Add</span>
+            </span>
+          </div>
+        `).join('')}
+      `).join('');
+    } catch (err) {
+      list.innerHTML = '<div class="empty-state">Load nahi hua.</div>';
+    }
+  });
+
+  function closeServiceModal() { document.getElementById('serviceModalOverlay').classList.remove('active'); }
+
+  async function addServiceToClient(name, category, price, cycle) {
+    try {
+      await adminFetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'addService', businessId: currentBizId, serviceName: name,
+          serviceCategory: category, price: price, billingCycle: cycle, status: 'Active'
+        })
+      });
+      closeServiceModal();
+      loadActiveServices();
+    } catch (err) {
+      alert('Service add nahi hui.');
+    }
+  }
+
+  // ================= REWARD TIERS =================
+
+  let currentTiersBizId = "";
+  let currentTiers = [];
+
+  async function openTiersModal(bizId, bizName) {
+    currentTiersBizId = bizId;
+    document.getElementById('tiersBizName').textContent = bizName;
+    document.getElementById('tiersModalOverlay').classList.add('active');
+    document.getElementById('tiersList').innerHTML = '<div class="loading-state">Load ho raha hai...</div>';
+
+    try {
+      const res = await adminFetch(`${SCRIPT_URL}?action=getBusiness&businessId=${bizId}`);
+      const data = await res.json();
+      currentTiers = (data.rewardTiers || []).slice();
+      renderTiersList();
+    } catch (err) {
+      currentTiers = [];
+      renderTiersList();
+    }
+  }
+
+  function renderTiersList() {
+    const list = document.getElementById('tiersList');
+    if (currentTiers.length === 0) {
+      list.innerHTML = '<div class="empty-state" style="padding:20px;">Abhi koi tier set nahi hai. Niche se add karein.</div>';
+      return;
+    }
+    currentTiers.sort((a, b) => Number(a.points) - Number(b.points));
+    list.innerHTML = currentTiers.map((t, idx) => `
+      <div class="service-row">
+        <div>
+          <div class="service-name">${t.points} Points</div>
+          <div class="service-cat">${escapeHtml(t.reward)}</div>
+        </div>
+        <button class="remove-service-btn" onclick="removeTierRow(${idx})">Remove</button>
+      </div>
+    `).join('');
+  }
+
+  function addTierRow() {
+    const points = document.getElementById('newTierPoints').value.trim();
+    const reward = document.getElementById('newTierReward').value.trim();
+    if (!points || !reward) { alert('Points aur Reward dono likhein.'); return; }
+    currentTiers.push({ points: Number(points), reward: reward });
+    document.getElementById('newTierPoints').value = '';
+    document.getElementById('newTierReward').value = '';
+    renderTiersList();
+  }
+
+  function removeTierRow(idx) {
+    currentTiers.splice(idx, 1);
+    renderTiersList();
+  }
+
+  function closeTiersModal() { document.getElementById('tiersModalOverlay').classList.remove('active'); }
+
+  document.getElementById('saveTiersBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveTiersBtn');
+    btn.disabled = true; btn.textContent = 'Save ho raha hai...';
+    try {
+      await adminFetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'updateRewardTiers', businessId: currentTiersBizId, tiers: currentTiers })
+      });
+      closeTiersModal();
+    } catch (err) {
+      alert('Save nahi hua, dobara try karein.');
+    }
+    btn.disabled = false; btn.textContent = 'Tiers Save Karein';
+  });
+
+  // Load businesses on page load
+  loadBusinessesList();
+</script>
+
+</body>
+</html>
