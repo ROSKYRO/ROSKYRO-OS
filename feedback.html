@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1a3c2a">
+<meta name="theme-color" content="#5B0CD6">
 <title>ROSKYRO-OS | Customer Feedback</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,13 +24,13 @@
   --ink-muted:   #6b7060;
   --border:      #e0ddd6;
 
-  --brand:       #1a4029;
-  --brand-mid:   #2d6645;
-  --brand-light: #e6f0eb;
+  --brand:       #5B0CD6;
+  --brand-mid:   #C2127A;
+  --brand-light: #f4ecfb;
 
-  --gold:        #c07c2a;
-  --gold-soft:   #fdf3e3;
-  --gold-border: #e8c97a;
+  --gold:        #FF6A00;
+  --gold-soft:   #fff1e6;
+  --gold-border: #ffb37a;
 
   --green-pop:   #22c55e;
   --red-soft:    #fff0ef;
@@ -559,6 +559,104 @@ textarea.field-input {
 .video-incentive-banner .vib-icon { font-size: 22px; line-height: 1; }
 .video-incentive-banner .vib-text { font-size: 12.5px; line-height: 1.5; color: var(--ink); }
 .video-incentive-banner .vib-text strong { display: block; margin-bottom: 2px; font-size: 13px; }
+
+/* ── BOLD VIDEO CTA (Step 3 / positive screen) ───── */
+.video-cta-card {
+  background: linear-gradient(135deg, var(--brand), var(--brand-mid));
+  border-radius: var(--radius-lg);
+  padding: 22px 20px;
+  margin-bottom: 16px;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-btn);
+}
+.video-cta-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 110px; height: 110px;
+  background: rgba(255,255,255,.08);
+  border-radius: 50%;
+}
+.video-cta-card::after {
+  content: '';
+  position: absolute;
+  bottom: -36px; left: -20px;
+  width: 90px; height: 90px;
+  background: rgba(255,255,255,.06);
+  border-radius: 50%;
+}
+.video-cta-icon { font-size: 34px; margin-bottom: 8px; position: relative; animation: vibPulse 1.8s ease-in-out infinite; }
+@keyframes vibPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+.video-cta-title { font-size: 16.5px; font-weight: 800; margin-bottom: 4px; position: relative; }
+.video-cta-sub { font-size: 12.5px; color: rgba(255,255,255,.85); line-height: 1.5; margin-bottom: 16px; position: relative; }
+.video-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold-border);
+  color: var(--brand);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 13px 24px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  transition: transform .15s ease;
+}
+.video-cta-btn:active { transform: scale(.97); }
+.video-cta-btn input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.video-cta-card.has-video .video-cta-btn { background: #fff; }
+.video-cta-pts { font-size: 11px; margin-top: 10px; color: rgba(255,255,255,.7); font-weight: 600; letter-spacing: .02em; position: relative; }
+.video-cta-guide {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.2);
+  text-align: left;
+  position: relative;
+}
+.video-cta-guide .vcg-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(255,255,255,.85);
+  margin-bottom: 8px;
+  letter-spacing: .02em;
+}
+.video-cta-guide .vcg-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #fff;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+.video-cta-guide .vcg-item:last-child { margin-bottom: 0; }
+.video-cta-guide .vcg-item span {
+  flex-shrink: 0;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--gold-border);
+  color: var(--brand);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.video-cta-card .media-preview-video { margin-top: 16px; position: relative; }
 .media-preview-wrap { margin-bottom: 16px; border-radius: var(--radius-md); overflow: hidden; }
 .media-preview-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); }
 .media-preview-video { width: 100%; border-radius: var(--radius-md); }
@@ -993,10 +1091,30 @@ textarea.field-input {
       <div class="screen-title">🎉Dhanyvad ! Aap amazing hain!</div>
       <div class="screen-subtitle">Aapne <strong id="ratingStarsDisplay"></strong> diya — aapko <span id="successPtsMsg">+20</span> Points mile!</div>
 
-      <div class="field">
-        <label class="field-label" for="feedbackTextPositive">Kuch aur bolna chahenge? <span class="field-optional">(optional)</span></label>
-        <textarea class="field-input" id="feedbackTextPositive" placeholder="Aapka experience hamare liye bahut important hai..."></textarea>
+      <textarea class="field-input hidden" id="feedbackTextPositive"></textarea>
+
+      <div class="video-cta-card" id="videoCta3p">
+        <div class="video-cta-icon">🌟</div>
+        <div class="video-cta-title">Hamare Celebrity Customer Baniye!</div>
+        <div class="video-cta-sub">15 sec video dein, hamare brand social media platform par feature honge ✨ <strong>(+50 Points)</strong></div>
+        <label class="video-cta-btn" id="videoCta3pBtn">
+          <span id="videoCta3pBtnText">📹 Video Upload Karein</span>
+          <input type="file" accept="video/*" capture="camcorder" id="videoInput3p" onchange="handleMediaUpload3p(event)">
+        </label>
+        <div class="video-cta-pts">Optional hai, par banna zaroor 🙏</div>
+        <div class="video-cta-guide">
+          <div class="vcg-title">🎬 Bas 2 baatein bolni hain</div>
+          <div class="vcg-item"><span>1</span>Aapko sabse achha kya laga?</div>
+          <div class="vcg-item"><span>2</span>Hum aur behtar kaise ho sakte hain?</div>
+        </div>
+        <video id="videoPreview3p" class="media-preview-video hidden" controls playsinline></video>
       </div>
+
+      <div class="consent-row hidden" id="consentRow3p">
+        <input type="checkbox" id="consentCheck3p">
+        <label for="consentCheck3p">Main is business ko meri video review social media ya website par share karne ki anumati deta/deti hoon</label>
+      </div>
+      <div id="errorBox3pMedia" class="alert alert-error hidden" style="margin-bottom:12px;"></div>
 
       <button class="btn-primary" id="submitPositiveBtn" onclick="submitPositive()">Submit Karein ✓</button>
       <div id="errorBox3p" class="alert alert-error hidden" style="margin-top:12px;"></div>
@@ -1161,7 +1279,7 @@ textarea.field-input {
       <button class="gr-popup-x" onclick="closeVideoFollowup()" aria-label="Close">✕</button>
       <div class="gr-popup-icon">🌟</div>
       <h3>Banna Chahenge Hamare Celebrity Customer?</h3>
-      <p>Ek chhota 15 second ka video review dein — hum ise apne Instagram/Social Media par feature karenge aur aap hamare <strong>celebrity customer</strong> ban jayenge! <span style="display:block;margin-top:6px;">(Bilkul optional hai, lekin hum chahte hain aap zaroor banein 🙏)</span></p>
+      <p>Ek chhota 15 second ka video review dein — hum ise hamare brand social media platform par feature karenge aur aap hamare <strong>celebrity customer</strong> ban jayenge! <span style="display:block;margin-top:6px;">(Bilkul optional hai, lekin hum chahte hain aap zaroor banein 🙏)</span></p>
       <label class="media-option" id="videoFollowupOption" style="margin:0 auto 14px;max-width:160px;">
         <div class="m-icon">🎥</div>
         <div class="m-label">Video Upload Karein</div>
@@ -1453,6 +1571,68 @@ function skipMedia() {
   goToStep(5);
 }
 
+/* ── STEP 3 VIDEO CTA UPLOAD (positive screen) ───── */
+async function handleMediaUpload3p(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const errBox = 'errorBox3pMedia';
+  if (file.size > 25 * 1024 * 1024) {
+    showError(errBox, 'Video bahut badi hai. 25MB se chhoti video daalein.');
+    return;
+  }
+  clearError(errBox);
+
+  const card    = document.getElementById('videoCta3p');
+  const vid     = document.getElementById('videoPreview3p');
+  const btnText = document.getElementById('videoCta3pBtnText');
+
+  const localPreviewUrl = URL.createObjectURL(file);
+  vid.src = localPreviewUrl;
+  vid.classList.remove('hidden');
+
+  mediaUploading = true;
+  mediaUrl  = '';
+  mediaType = 'video';
+  btnText.textContent = '⏳ Upload ho raha hai...';
+  showToast('⏳ Upload ho raha hai...');
+
+  try {
+    const cloudName = ROSKYRO_CONFIG.CLOUDINARY_CLOUD_NAME;
+    const preset = ROSKYRO_CONFIG.CLOUDINARY_UPLOAD_PRESET;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', preset);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (!data.secure_url) {
+      throw new Error(data.error?.message || 'Upload failed');
+    }
+
+    mediaUrl = data.secure_url;
+    card.classList.add('has-video');
+    btnText.textContent = '✓ Video Add ho gaya';
+    document.getElementById('consentRow3p').classList.remove('hidden');
+    showToast('🎥 +50 Points kamaye!', 2500);
+  } catch (err) {
+    showError(errBox, 'Video upload nahi ho saka. Phir koshish karein.');
+    mediaUrl  = '';
+    mediaType = '';
+    card.classList.remove('has-video');
+    btnText.textContent = '📹 Video Upload Karein';
+    vid.classList.add('hidden');
+    document.getElementById('consentRow3p').classList.add('hidden');
+  } finally {
+    mediaUploading = false;
+  }
+}
+
 /* ── GOOGLE REVIEW CLICK TRACKING ────────────────── */
 function markGoogleClick() {
   // Called after submit when we have the referral code
@@ -1576,7 +1756,7 @@ async function submitPositive() {
   }
   if (mediaType === 'video' && mediaUrl) {
     payload.videoUrl = mediaUrl;
-    payload.consentToShare = document.getElementById('consentCheck')?.checked ? 'Yes' : 'No';
+    payload.consentToShare = document.getElementById('consentCheck3p')?.checked ? 'Yes' : 'No';
   }
 
   try {
