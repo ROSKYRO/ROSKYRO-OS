@@ -539,9 +539,70 @@ textarea.field-input {
   opacity: 0;
   cursor: pointer;
 }
+.media-option .m-bonus {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green-pop, #16a34a);
+  text-align: center;
+  line-height: 1.3;
+}
+.video-incentive-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--gold-soft, #fff7e6);
+  border: 1.5px solid var(--gold, #d4a017);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.video-incentive-banner .vib-icon { font-size: 22px; line-height: 1; }
+.video-incentive-banner .vib-text { font-size: 12.5px; line-height: 1.5; color: var(--ink); }
+.video-incentive-banner .vib-text strong { display: block; margin-bottom: 2px; font-size: 13px; }
 .media-preview-wrap { margin-bottom: 16px; border-radius: var(--radius-md); overflow: hidden; }
 .media-preview-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); }
 .media-preview-video { width: 100%; border-radius: var(--radius-md); }
+
+/* ── GOOGLE REVIEW MANDATORY POPUP ── */
+.gr-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,10,20,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.gr-popup-overlay.hidden { display: none; }
+.gr-popup-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 24px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  position: relative;
+}
+.gr-popup-icon { font-size: 40px; margin-bottom: 10px; }
+.gr-popup-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; color: var(--ink); }
+.gr-popup-card p { font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 20px; }
+.gr-popup-card p strong { color: var(--gold, #d4a017); }
+.gr-popup-x {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  opacity: .5;
+}
+.gr-popup-x:hover { opacity: 1; }
 
 /* ── VIDEO GUIDE ─────────────────────────────────── */
 .video-guide {
@@ -892,12 +953,8 @@ textarea.field-input {
         <input class="field-input" type="text" id="customerName" placeholder="Jaise: Rahul, Priya..." autocomplete="name" inputmode="text">
       </div>
       <div class="field">
-        <label class="field-label" for="customerPhone">Mobile Number <span class="field-optional">(optional — points ke liye)</span></label>
-        <input class="field-input" type="tel" id="customerPhone" placeholder="10-digit number" inputmode="numeric" maxlength="10" autocomplete="tel">
-      </div>
-      <div class="field">
-        <label class="field-label" for="socialMediaId">Instagram / Social ID <span class="field-optional">(optional)</span></label>
-        <input class="field-input" type="text" id="socialMediaId" placeholder="@username" autocomplete="off">
+        <label class="field-label" for="customerPhone">Mobile Number <span class="field-optional">(zaroori — duplicate review rokne ke liye)</span></label>
+        <input class="field-input" type="tel" id="customerPhone" placeholder="10-digit number" inputmode="numeric" maxlength="10" autocomplete="tel" required>
       </div>
 
       <button class="btn-primary" onclick="goToStep(2)">Aage Barhen &rarr;</button>
@@ -935,16 +992,6 @@ textarea.field-input {
       <div class="screen-eyebrow">Step 3 of 6</div>
       <div class="screen-title">🎉Dhanyvad ! Aap amazing hain!</div>
       <div class="screen-subtitle">Aapne <strong id="ratingStarsDisplay"></strong> diya — aapko <span id="successPtsMsg">+20</span> Points mile!</div>
-
-      <div class="google-block">
-        <div class="google-logo">🌐</div>
-        <h3>Google Review Dein</h3>
-        <p>Google Review se doosron ko bhi madad hogi. Sirf 1 minute lagega!</p>
-        <a href="#" id="googleReviewBtn" class="btn-google" target="_blank" rel="noopener">
-          <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.6 20.2H42V20H24v8h11.3C33.7 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.8z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.1L31.7 33c-2 1.5-4.5 2.3-7.3 2.3-5.2 0-9.6-3.5-11.2-8.3l-6.5 5C9.5 39.5 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.1-2.1 3.9-3.9 5.2l6.2 5.3C37.2 40.3 44 35 44 24c0-1.3-.1-2.5-.4-3.8z"/></svg>
-          Google Review Dein
-        </a>
-      </div>
 
       <div class="field">
         <label class="field-label" for="feedbackTextPositive">Kuch aur bolna chahenge? <span class="field-optional">(optional)</span></label>
@@ -992,6 +1039,14 @@ textarea.field-input {
       <div class="screen-title">Photo ya Video add karein?</div>
       <div class="screen-subtitle">Aur points kamayein! Bilkul optional hai.</div>
 
+      <div class="video-incentive-banner">
+        <div class="vib-icon">🎁</div>
+        <div class="vib-text">
+          <strong>Video review dein, extra fayda paayein!</strong>
+          Video review par sabse zyada points milte hain — aur agli visit par discount bhi!
+        </div>
+      </div>
+
       <div class="media-options">
         <label class="media-option" id="photoOption" onclick="selectMedia('photo')">
           <div class="m-icon">📷</div>
@@ -999,10 +1054,11 @@ textarea.field-input {
           <div class="m-pts">+30 pts</div>
           <input type="file" accept="image/*" capture="environment" id="photoInput" onchange="handleMediaUpload(event, 'photo')">
         </label>
-        <label class="media-option" id="videoOption">
+        <label class="media-option" id="videoOption" onclick="selectMedia('video')">
           <div class="m-icon">🎥</div>
           <div class="m-label">15 Sec Video</div>
           <div class="m-pts">+50 pts</div>
+          <div class="m-bonus">+ Next Visit Discount</div>
           <input type="file" accept="video/*" capture="camcorder" id="videoInput" onchange="handleMediaUpload(event, 'video')">
         </label>
       </div>
@@ -1010,9 +1066,9 @@ textarea.field-input {
       <div class="video-guide hidden" id="videoGuide">
         <div class="vg-title">🎬 Video mein ye batayein:</div>
         <ol>
-          <li>Aapko kya pasand aaya? (What did you like?)</li>
+          <li>Aapko sabse achha kya laga? (What did you like the most?)</li>
+          <li>Hum ise aur behtar kaise bana sakte hain? (How can we improve?)</li>
           <li>Kya aap hamare baare mein doston ko batayenge?</li>
-          <li>Staff ke baare mein kya kaha jayega?</li>
         </ol>
       </div>
 
@@ -1077,17 +1133,27 @@ textarea.field-input {
         WhatsApp pe Share Karein
       </a>
 
-      <a href="#" id="googleReviewFinalBtn" class="btn-google hidden" target="_blank" style="margin-bottom:12px;" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 48 48" fill="none"><path fill="#FFC107" d="M43.6 20.2H42V20H24v8h11.3C33.7 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.8z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.1L31.7 33c-2 1.5-4.5 2.3-7.3 2.3-5.2 0-9.6-3.5-11.2-8.3l-6.5 5C9.5 39.5 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.1-2.1 3.9-3.9 5.2l6.2 5.3C37.2 40.3 44 35 44 24c0-1.3-.1-2.5-.4-3.8z"/></svg>
-        Google Review Dein
-      </a>
-
       <div style="text-align:center;margin-top:8px;">
         <button class="btn-skip" onclick="window.close()" style="color:var(--ink-muted);">Done ✓</button>
       </div>
     </div>
 
   </div><!-- /screens -->
+
+  <!-- ── GOOGLE REVIEW POPUP (mandatory on positive review) ── -->
+  <div id="googleReviewPopup" class="gr-popup-overlay hidden">
+    <div class="gr-popup-card pop-in">
+      <button class="gr-popup-x" onclick="closeGooglePopup()" aria-label="Close">✕</button>
+      <div class="gr-popup-icon">❤️</div>
+      <h3>Aapki Rai Hamare Liye Bahut Mahatvapurn Hai</h3>
+      <p>Kripya Google Par Apna Review Share Karein.</p>
+      <a href="#" id="googleReviewPopupBtn" class="btn-google" target="_blank" rel="noopener" onclick="handleGooglePopupClick()">
+        <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.6 20.2H42V20H24v8h11.3C33.7 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.8z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.1 8 2.9l5.7-5.7C34.5 6.5 29.5 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.1L31.7 33c-2 1.5-4.5 2.3-7.3 2.3-5.2 0-9.6-3.5-11.2-8.3l-6.5 5C9.5 39.5 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.1-2.1 3.9-3.9 5.2l6.2 5.3C37.2 40.3 44 35 44 24c0-1.3-.1-2.5-.4-3.8z"/></svg>
+        Haan, Madad Karta Hoon
+      </a>
+    </div>
+  </div>
+
 
   <!-- POINTS TOAST -->
   <div class="points-toast" id="pointsToast"></div>
@@ -1178,7 +1244,13 @@ async function loadBusiness() {
 function goToStep(step) {
   // Validation before advancing
   if (step === 2 && currentStep === 1) {
-    // Screen 1 is optional fields — always allow
+    const phone = document.getElementById('customerPhone').value.trim();
+    const errBox = document.getElementById('errorBox1');
+    if (!/^\d{10}$/.test(phone)) {
+      showError(errBox, 'Kripya sahi 10-digit mobile number daalein.');
+      return;
+    }
+    clearError(errBox);
   }
   if (step === 4 && currentStep < 4) {
     // came from positive screen — fine
@@ -1259,12 +1331,6 @@ function selectRating(rating) {
     const starEmojis = '⭐'.repeat(rating);
     const ratingDisp = document.getElementById('ratingStarsDisplay');
     if (ratingDisp) ratingDisp.textContent = starEmojis;
-
-    // Show google review link
-    const googleBtn = document.getElementById('googleReviewBtn');
-    if (googleBtn) {
-      googleBtn.href = businessData.googleReviewLink || '#';
-    }
 
     goToStep(3);
   }, 600);
@@ -1382,13 +1448,22 @@ function markGoogleClickByCode(referralCode) {
   }).catch(() => {});
 }
 
+/* ── GOOGLE REVIEW POPUP HANDLERS ─────────────────── */
+function handleGooglePopupClick() {
+  markGoogleClickByCode(window.GR_REFERRAL_CODE);
+  // Close popup shortly after — link opens in new tab so user stays on this page
+  setTimeout(closeGooglePopup, 300);
+}
+function closeGooglePopup() {
+  document.getElementById('googleReviewPopup').classList.add('hidden');
+}
+
 /* ── SUBMIT: POSITIVE ────────────────────────────── */
 async function submitPositive() {
   if (submitting) return;
 
   const name     = document.getElementById('customerName').value.trim();
   const phone    = document.getElementById('customerPhone').value.trim();
-  const social   = document.getElementById('socialMediaId').value.trim();
   const feedback = document.getElementById('feedbackTextPositive').value.trim() || 'Positive review';
   const referral = document.getElementById('referralCodeInput').value.trim().toUpperCase();
   const errBox   = document.getElementById('errorBox3p');
@@ -1402,7 +1477,6 @@ async function submitPositive() {
     businessId: BUSINESS_ID,
     customerName: name,
     customerPhone: phone,
-    socialMediaId: social,
     rating: selectedRating,
     feedback: feedback,
     referredBy: referral || REFERRED_BY
@@ -1421,7 +1495,7 @@ async function submitPositive() {
     const data = await res.json();
     if (data.success) {
       showSuccess(data, true);
-    } else if (data.error === 'ALREADY_REVIEWED') {
+    } else if (data.error === 'ALREADY_REVIEWED' || data.error === 'PHONE_REQUIRED') {
       showError(errBox, data.message || 'Aap pehle hi review de chuke hain.');
       setBtnLoading('submitPositiveBtn', false, 'Submit Karein ✓');
     } else {
@@ -1474,7 +1548,6 @@ async function submitNegative() {
       body: JSON.stringify({
         action: 'submitFeedback', businessId: BUSINESS_ID,
         customerName: name, customerPhone: phone,
-        socialMediaId: document.getElementById('socialMediaId').value.trim(),
         rating: selectedRating, feedback: complaintText,
         referredBy: referral || REFERRED_BY
       })
@@ -1482,6 +1555,11 @@ async function submitNegative() {
     const data = await res.json();
     if (data.success) {
       showSuccess(data, false);
+    } else if (data.error === 'ALREADY_REVIEWED' || data.error === 'PHONE_REQUIRED') {
+      showError(errBox, data.message || 'Aap pehle hi review de chuke hain.');
+      setBtnLoading('submitNegativeBtn', false, 'Submit Karein');
+      submitting = false;
+      return;
     } else {
       throw new Error('failed');
     }
@@ -1565,12 +1643,13 @@ async function showSuccess(data, isPositive) {
   document.getElementById('whatsappShareBtn').href = `https://wa.me/?text=${encodeURIComponent(waMessage)}`;
   document.getElementById('whatsappShareBtn').classList.remove('hidden');
 
-  // Google button on success screen
+  // Mandatory Google Review popup — shown after submit on positive reviews
   if (isPositive && businessData.googleReviewLink) {
-    const gBtn = document.getElementById('googleReviewFinalBtn');
-    gBtn.href = businessData.googleReviewLink;
-    gBtn.onclick = () => markGoogleClickByCode(data.referralCode);
-    gBtn.classList.remove('hidden');
+    window.GR_REFERRAL_CODE = data.referralCode;
+    document.getElementById('googleReviewPopupBtn').href = businessData.googleReviewLink;
+    setTimeout(() => {
+      document.getElementById('googleReviewPopup').classList.remove('hidden');
+    }, 900);
   }
 
   // Tier unlock
@@ -1674,7 +1753,6 @@ function saveDraft() {
     localStorage.setItem(SAVE_KEY, JSON.stringify({
       name:    document.getElementById('customerName').value,
       phone:   document.getElementById('customerPhone').value,
-      social:  document.getElementById('socialMediaId').value,
       step:    currentStep,
       rating:  selectedRating,
     }));
@@ -1686,11 +1764,10 @@ function restoreDraft() {
     if (!saved) return;
     if (saved.name)   document.getElementById('customerName').value  = saved.name;
     if (saved.phone)  document.getElementById('customerPhone').value = saved.phone;
-    if (saved.social) document.getElementById('socialMediaId').value  = saved.social;
   } catch {}
 }
 restoreDraft();
-['customerName','customerPhone','socialMediaId'].forEach(id => {
+['customerName','customerPhone'].forEach(id => {
   document.getElementById(id).addEventListener('input', saveDraft);
 });
 </script>
